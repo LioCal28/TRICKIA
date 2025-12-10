@@ -53,11 +53,16 @@ window.addEventListener("load", async () => {
 
         const list = document.getElementById("theme-checkboxes");
         categories.forEach(cat => {
+            let name = cat.name;
+            // Remove "Entertainment:" prefix for display
+            if (name.startsWith("Entertainment:")) {
+                name = name.split(":")[1].trim();
+            }
             const li = document.createElement("li");
             li.innerHTML = `
                 <label>
                     <input type="checkbox" class="theme-check" value="${cat.id}" checked>
-                    ${cat.name}
+                    ${name}
                 </label>`;
             list.appendChild(li);
         });
@@ -135,9 +140,15 @@ async function startQuiz() {
     sessionCorrectAnswers = 0;
     lastCorrectGlobal = 0;
     lastTotalGlobal = 0;
+
     drawPieChart(0, 0);
 
-    // Inform backend of new session (reset used questions, score, etc.)
+    // Reset sidebar lists & source label
+    document.getElementById("stats-list").innerHTML = "";
+    document.getElementById("api-stats-list").innerHTML = "";
+    document.getElementById("current-source").textContent = "-";
+
+    // Inform backend of new session (reset used questions, score, stats, etc.)
     try {
         await fetch("/api/session/start", { method: "POST" });
     } catch (err) {
@@ -148,14 +159,18 @@ async function startQuiz() {
     document.getElementById("quiz-area").classList.remove("hidden");
 
     updateQuestionCounterDisplay();
-    loadStats();      // Theme stats + API stats (global)
+    loadStats();      // Theme stats + API stats (reset)
 }
 
-// Update text "Question X / N"
+// Update "Question X / N" text and progress bar
 function updateQuestionCounterDisplay() {
     const displayIndex = Math.min(sessionCurrentQuestion + 1, sessionTotalQuestions);
     document.getElementById("q-number").textContent =
         `${displayIndex} / ${sessionTotalQuestions}`;
+
+    const progressBar = document.getElementById("progress-bar");
+    const ratio = sessionTotalQuestions === 0 ? 0 : sessionCurrentQuestion / sessionTotalQuestions;
+    progressBar.style.width = (ratio * 100) + "%";
 }
 
 // ----------------------------------------------------
@@ -199,6 +214,11 @@ function displayQuestion(q) {
     document.getElementById("category").textContent = q.category;
     document.getElementById("difficulty").textContent = q.difficulty;
 
+    // Display source immediately
+    if (q.source) {
+        document.getElementById("current-source").textContent = q.source;
+    }
+
     const answersBox = document.getElementById("answers");
     answersBox.innerHTML = "";
 
@@ -206,7 +226,7 @@ function displayQuestion(q) {
         const b = document.createElement("button");
         b.className = "answer-btn";
         b.textContent = a;
-        b.onclick = () => sendAnswer(q.id, a);
+        b.onclick = () => sendAnswer(q.id, a, b);
         answersBox.appendChild(b);
     });
 }
@@ -214,7 +234,7 @@ function displayQuestion(q) {
 // ----------------------------------------------------
 // SEND ANSWER
 // ----------------------------------------------------
-async function sendAnswer(id, answer) {
+async function sendAnswer(id, answer, clickedButton) {
     // Prevent multiple clicks
     disableAnswers();
 
@@ -236,22 +256,31 @@ async function sendAnswer(id, answer) {
             sessionCorrectAnswers += 1;
         }
 
-        // Feedback text
+        // Remove textual bold feedback (now using only highlight)
         const fb = document.getElementById("feedback");
+        fb.textContent = "";
         fb.className = "";
-        if (r.status === "success") {
-            fb.textContent = "Bonne réponse !";
-            fb.classList.add("feedback-good");
-        } else {
-            fb.textContent = "Mauvaise réponse. La bonne réponse était : " + r.correct;
-            fb.classList.add("feedback-bad");
-        }
 
-        // Update current source label
+        // Update current source label (for safety)
         if (r.source) {
             const srcLabel = document.getElementById("current-source");
             srcLabel.textContent = r.source;
         }
+
+        // Animated highlight on answers
+        const buttons = document.querySelectorAll(".answer-btn");
+        buttons.forEach(btn => {
+            // Clean previous highlight classes just in case
+            btn.classList.remove("answer-correct", "answer-wrong", "answer-highlight");
+
+            if (btn.textContent === r.correct) {
+                // Correct answer
+                btn.classList.add("answer-correct", "answer-highlight");
+            } else if (btn === clickedButton && r.status !== "success") {
+                // Wrong answer clicked by user
+                btn.classList.add("answer-wrong", "answer-highlight");
+            }
+        });
 
         // Update stats panels + pie chart
         await loadStats();
@@ -276,7 +305,7 @@ function disableAnswers() {
 function enableAnswers() {
     document.querySelectorAll(".answer-btn").forEach(b => {
         b.disabled = false;
-        b.classList.remove("disabled");
+        b.classList.remove("disabled", "answer-correct", "answer-wrong", "answer-highlight");
     });
 }
 
@@ -303,7 +332,7 @@ async function loadStats() {
             list.appendChild(li);
         });
 
-        // Pie chart is now session-based, not global
+        // Pie chart is now session-based
         lastCorrectGlobal = sessionCorrectAnswers;
         lastTotalGlobal = sessionCurrentQuestion;
         drawPieChart(sessionCorrectAnswers, sessionCurrentQuestion);

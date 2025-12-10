@@ -3364,5 +3364,65 @@
         "category": "Entertainment",
         "difficulty": "medium",
         "source": "TheTriviaAPI"
+    },
+    {
+        "question_id": 1,
+        "user_answer": "A mummy",
+        "correct_answer": "A mummy",
+        "correct": true,
+        "score_after": 1,
+        "category": "Society & Culture",
+        "difficulty": "easy",
+        "source": "TheTriviaAPI"
+    },
+    {
+        "question_id": 2,
+        "user_answer": "Landsberg Prison",
+        "correct_answer": "Landsberg Prison",
+        "correct": true,
+        "score_after": 2,
+        "category": "History",
+        "difficulty": "medium",
+        "source": "OpenTriviaDB"
+    },
+    {
+        "question_id": 3,
+        "user_answer": "Tomorrow Never Dies",
+        "correct_answer": "Live and Let Die",
+        "correct": false,
+        "score_after": 2,
+        "category": "Entertainment",
+        "difficulty": "medium",
+        "source": "TheTriviaAPI"
+    },
+    {
+        "question_id": 4,
+        "user_answer": "A Tadpole",
+        "correct_answer": "A Bunny",
+        "correct": false,
+        "score_after": 2,
+        "category": "Mathematics",
+        "difficulty": "easy",
+        "source": "TheTriviaAPI"
+    },
+    {
+        "question_id": 5,
+        "user_answer": "James",
+        "correct_answer": "James",
+        "correct": true,
+        "score_after": 3,
+        "category": "Society & Culture",
+        "difficulty": "medium",
+        "source": "OpenTriviaDB"
+    },
+    {
+        "question_id": 6,
+        "user_answer": "Naomi Watts",
+        "correct_answer": "Reese Witherspoon",
+        "correct": false,
+        "score_after": 3,
+        "category": "Television",
+        "difficulty": "hard",
+        "source": "TheTriviaAPI"
     }
 ]

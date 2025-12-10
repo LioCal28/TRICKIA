@@ -101,7 +101,7 @@ def save_user_stat(entry):
 # CATEGORY NORMALIZATION
 # -----------------------------------------------------
 def canonical_theme_from_opentdb_id(cat_id):
-    """Map OpenTriviaDB category ID to a canonical theme name."""
+    """Map OpenTriviaDB category ID to a canonical theme name (clean, no 'Entertainment:' prefix)."""
     if cat_id is None:
         return "General Knowledge"
 
@@ -133,8 +133,9 @@ def canonical_theme_from_opentdb_id(cat_id):
     if "history" in n:
         return "History"
 
+    # Music (remove 'Entertainment:' prefix)
     if "music" in n:
-        return "Entertainment: Music"
+        return "Music"
 
     # Films / TV -> Television bucket
     if "television" in n or "film" in n or "movie" in n:
@@ -160,7 +161,10 @@ def canonical_theme_from_opentdb_id(cat_id):
     if any(k in n for k in ["comics", "anime", "cartoon", "musicals", "theatres", "books", "board games", "japanese"]):
         return "Entertainment"
 
-    # Default: keep original
+    # Default: remove 'Entertainment:' prefix if still present
+    if name.startswith("Entertainment:"):
+        return name.split(":", 1)[1].strip()
+
     return name
 
 
@@ -175,7 +179,7 @@ def trivia_slug_for_theme(canonical_theme: str | None):
     if "science" in t:
         return "science"
     if "mathematics" in t:
-        # Trivia may not have dedicated math, use science
+        # The Trivia API may not have dedicated math, use science
         return "science"
     if "geography" in t:
         return "geography"
@@ -224,14 +228,12 @@ def fetch_trivia_question(category_id=None):
     answers = incorrect + [correct]
     random.shuffle(answers)
 
-    category = html.unescape(q.get("category", "Unknown"))
     difficulty = html.unescape(q.get("difficulty", "unknown"))
 
     return {
         "question": question,
         "correct": correct,
         "answers": answers,
-        "category": category,
         "difficulty": difficulty
     }
 
@@ -274,13 +276,10 @@ def fetch_triviaapi_question(canonical_theme: str | None = None):
     random.shuffle(answers)
 
     difficulty = q.get("difficulty", "unknown")
-    category = canonical_theme or q.get("category", "Unknown")
-
     return {
         "question": question,
         "correct": correct,
         "answers": answers,
-        "category": category,
         "difficulty": difficulty
     }
 
@@ -346,10 +345,9 @@ def fetch_question_any_source(category_id, canonical_theme):
 def start_session():
     """
     Called from frontend at the beginning of a new quiz session.
-    Resets session-level state: question counter, score, used questions, API disabled flags.
-    Global theme/API stats are kept.
+    Resets session-level and stats state.
     """
-    global QUESTION_NUMBER, USER_SCORE, USED_QUESTIONS, API_DISABLED
+    global QUESTION_NUMBER, USER_SCORE, USED_QUESTIONS, API_DISABLED, THEME_STATS, API_STATS
 
     QUESTION_NUMBER = 0
     USER_SCORE = 0
@@ -357,6 +355,13 @@ def start_session():
     API_DISABLED = {
         "OpenTriviaDB": False,
         "TheTriviaAPI": False,
+    }
+
+    # Reset theme and API performance stats for this new quiz
+    THEME_STATS = {}
+    API_STATS = {
+        "OpenTriviaDB": {"correct": 0, "total": 0},
+        "TheTriviaAPI": {"correct": 0, "total": 0},
     }
 
     return jsonify({"status": "ok"})
@@ -389,7 +394,7 @@ def get_question():
             source = src
             break
 
-    # Si on n'a pas pu éviter un doublon, on prend la dernière
+    # If we couldn't avoid duplicates, just use the last fetched question
     if q is None or source is None:
         q, source = fetch_question_any_source(category_id, canonical_theme)
 
@@ -403,7 +408,8 @@ def get_question():
         "question": q["question"],
         "answers": q["answers"],
         "category": canonical_theme,
-        "difficulty": q["difficulty"]
+        "difficulty": q["difficulty"],
+        "source": source
     })
 
 
