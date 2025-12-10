@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRICKIA</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header id="main-header">
+    <div id="logo-area">
+        <span id="logo">TRICKIA</span>
+        <span id="subtitle">Your own evolving quiz!</span>
+    </div>
+
+    <button id="theme-toggle">☾ Dark mode</button>
+</header>
+
+<!-- LAYOUT GLOBAL -->
+<div id="container">
+
+    <!-- THEMES EXCLUS (à gauche) -->
+    <aside id="excluded-panel">
+        <div class="panel-header">
+            <h3>Excluded themes</h3>
+        </div>
+        <ul id="excluded-list"></ul>
+    </aside>
+
+    <!-- ZONE CENTRALE -->
+    <main id="app">
+
+        <!-- CHOIX DU MODE DE SESSION -->
+        <section id="mode-selector">
+            <h2>Select your session mode</h2>
+            <p>Choose how deep you want to go:</p>
+            <button class="mode-btn" data-count="20">EXPRESS (20 questions)</button>
+            <button class="mode-btn" data-count="50">COMMIT (50 questions)</button>
+            <button class="mode-btn" data-count="100">FULL-STACK (100 questions)</button>
+        </section>
+
+        <!-- SÉLECTEUR DE THÈMES -->
+        <section id="theme-selector" class="hidden">
+            <h2>Select Allowed Themes</h2>
+            <p>Uncheck themes you want to exclude from this session.</p>
+            <ul id="theme-checkboxes"></ul>
+            <button id="save-themes">Validate themes &amp; start quiz</button>
+        </section>
+
+        <!-- ZONE QUIZ -->
+        <section id="quiz-area" class="hidden">
+
+            <div id="top-area">
+                <!-- Statut de la question -->
+                <div id="status-bar">
+                    <p><strong>Question :</strong> <span id="q-number">0 / 0</span></p>
+                    <p><strong>Score :</strong> <span id="score">0</span></p>
+                    <p><strong>Category :</strong> <span id="category">-</span></p>
+                    <p><strong>Difficulty :</strong> <span id="difficulty">-</span></p>
+                </div>
+
+                <!-- Diagramme camembert -->
+                <div id="chart-container">
+                    <canvas id="piechart" width="140" height="140"></canvas>
+                    <div id="chart-tooltip" class="hidden"></div>
+                </div>
+            </div>
+
+            <div id="question-box">
+                <p id="question-text">Click "New question" to start the quiz!</p>
+                <div id="answers"></div>
+                <p id="feedback"></p>
+            </div>
+
+            <button id="btn-new">New question</button>
+        </section>
+
+        <!-- FIN DE SESSION -->
+        <section id="session-summary" class="hidden">
+            <h2>Session summary</h2>
+            <p id="summary-score"></p>
+            <p id="summary-message"></p>
+            <button id="restart-session">Start a new session</button>
+        </section>
+
+    </main>
+
+    <!-- STATISTIQUES (à droite) -->
+    <aside id="sidebar">
+        <div class="panel-header">
+            <h3>Theme statistics</h3>
+        </div>
+        <ul id="stats-list"></ul>
+    </aside>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+  # lecture/écriture JSON centralisée

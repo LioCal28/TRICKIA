@@ -1,0 +1,311 @@
+/* ---------------------------------------------------
+   VARIABLES : LIGHT / DARK
+--------------------------------------------------- */
+:root {
+    --bg: #f2f3f8;
+    --card-bg: #ffffff;
+    --text: #1e1e1e;
+    --primary: #920914;          /* bordeaux clair */
+    --primary-dark: #5e0008;     /* bordeaux plus sombre */
+    --accent: #f6f7fc;
+    --border: #dbe1ee;
+    --success: #1fa31f;
+    --error: #d62828;
+}
+
+body.dark {
+    --bg: #1b1e27;
+    --card-bg: #2a2e3a;
+    --text: #e8e8e8;
+    --primary: #2b4ea3;          /* bleu thème sombre */
+    --primary-dark: #152854;     /* bleu plus sombre */
+    --accent: #242836;
+    --border: #373b48;
+}
+
+/* ---------------------------------------------------
+   GLOBAL
+--------------------------------------------------- */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    transition: background 0.3s, color 0.3s;
+}
+
+/* ---------------------------------------------------
+   HEADER
+--------------------------------------------------- */
+#main-header {
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    background: linear-gradient(
+        135deg,
+        var(--primary-dark),
+        var(--primary),
+        var(--primary-dark)
+    );
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+#logo-area {
+    display: flex;
+    flex-direction: column;
+}
+
+#logo {
+    font-size: 28px;
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+
+#subtitle {
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+#theme-toggle {
+    padding: 8px 16px;
+    background: rgba(255,255,255,0.9);
+    color: var(--primary-dark);
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s, transform 0.1s;
+}
+
+#theme-toggle:hover {
+    background: #ffffff;
+    transform: translateY(-1px);
+}
+
+/* ---------------------------------------------------
+   LAYOUT
+--------------------------------------------------- */
+#container {
+    display: flex;
+    gap: 25px;
+    padding: 25px;
+}
+
+/* ---------------------------------------------------
+   PANELS LATERAUX
+--------------------------------------------------- */
+#excluded-panel,
+#sidebar {
+    width: 260px;
+    background: var(--card-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-header {
+    background: var(--accent);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 10px;
+    border-radius: 12px 12px 0 0;
+}
+
+.panel-header h3 {
+    margin: 0;
+    font-size: 15px;
+}
+
+#excluded-list,
+#stats-list {
+    list-style: none;
+    padding: 10px 12px;
+    margin: 0;
+    flex: 1;
+}
+
+#excluded-list li,
+#stats-list li {
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+}
+
+.stat-good { color: var(--success); font-weight: bold; }
+.stat-bad  { color: var(--error);  font-weight: bold; }
+
+/* ---------------------------------------------------
+   ZONE CENTRALE
+--------------------------------------------------- */
+#app {
+    width: 720px;
+}
+
+/* Sections */
+#mode-selector,
+#theme-selector,
+#quiz-area,
+#session-summary {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 20px 22px;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.hidden {
+    display: none;
+}
+
+/* TITRES SECTIONS */
+#mode-selector h2,
+#theme-selector h2,
+#session-summary h2 {
+    margin-top: 0;
+}
+
+/* ---------------------------------------------------
+   BOUTONS GENERIQUES
+--------------------------------------------------- */
+button {
+    font-family: inherit;
+}
+
+.mode-btn,
+#save-themes,
+#btn-new,
+#restart-session {
+    width: 100%;
+    padding: 12px 16px;
+    margin-top: 10px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+}
+
+.mode-btn:hover,
+#save-themes:hover,
+#btn-new:hover,
+#restart-session:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+/* ---------------------------------------------------
+   SELECTION THEMES
+--------------------------------------------------- */
+#theme-selector ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+#theme-selector li {
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+/* ---------------------------------------------------
+   QUIZ AREA
+--------------------------------------------------- */
+#top-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#status-bar p {
+    margin: 3px 0;
+    font-size: 14px;
+}
+
+/* Question box */
+#question-box {
+    margin-top: 18px;
+    background: var(--accent);
+    padding: 18px;
+    border-radius: 10px;
+    border-left: 4px solid var(--primary);
+}
+
+#question-text {
+    font-size: 18px;
+    margin-bottom: 12px;
+}
+
+/* Buttons answers */
+.answer-btn {
+    width: 100%;
+    margin: 5px 0;
+    padding: 11px;
+    font-size: 15px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+}
+
+.answer-btn:hover:not(.disabled) {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.answer-btn.disabled {
+    background: #8c8c8c !important;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Feedback */
+#feedback {
+    margin-top: 14px;
+    font-size: 17px;
+    font-weight: bold;
+}
+
+.feedback-good { color: var(--success); }
+.feedback-bad  { color: var(--error);  }
+
+/* ---------------------------------------------------
+   PIE CHART
+--------------------------------------------------- */
+#chart-container {
+    width: 150px;
+    height: 150px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#chart-tooltip {
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translate(-50%, 100%);
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: 4px 8px;
+    font-size: 12px;
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    white-space: nowrap;
+}
+
+/* ---------------------------------------------------
+   SESSION SUMMARY
+--------------------------------------------------- */
+#session-summary p {
+    font-size: 16px;
+}

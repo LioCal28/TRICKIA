@@ -1,0 +1,2576 @@
+[
+    {
+        "question_id": 1,
+        "user_answer": "August 24, 1996",
+        "correct_answer": "August 24, 1996",
+        "correct": true,
+        "score_after": 1,
+        "category": "Entertainment: Video Games",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 2,
+        "user_answer": "The Prince",
+        "correct_answer": "The Prince",
+        "correct": true,
+        "score_after": 2,
+        "category": "Politics",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 1,
+        "user_answer": "7",
+        "correct_answer": "5",
+        "correct": false,
+        "score_after": 0,
+        "category": "Entertainment: Japanese Anime & Manga",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 2,
+        "user_answer": "HOTTIE",
+        "correct_answer": "LAMB",
+        "correct": false,
+        "score_after": 0,
+        "category": "Entertainment: Music",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 3,
+        "user_answer": "Uranus",
+        "correct_answer": "Uranus",
+        "correct": true,
+        "score_after": 1,
+        "category": "Science & Nature",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 4,
+        "user_answer": "George Costanza",
+        "correct_answer": "Daniel Johns",
+        "correct": false,
+        "score_after": 1,
+        "category": "Entertainment: Music",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 1,
+        "user_answer": "Lorde",
+        "correct_answer": "Ladyhawke",
+        "correct": false,
+        "score_after": 0,
+        "category": "Entertainment: Music",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 2,
+        "user_answer": "Austin",
+        "correct_answer": "Austin",
+        "correct": true,
+        "score_after": 1,
+        "category": "Geography",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 3,
+        "user_answer": "Lumen",
+        "correct_answer": "Candela",
+        "correct": false,
+        "score_after": 1,
+        "category": "Science & Nature",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 4,
+        "user_answer": "Oichi",
+        "correct_answer": "Nobunaga",
+        "correct": false,
+        "score_after": 1,
+        "category": "Entertainment: Video Games",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 5,
+        "user_answer": "The Dragon Slayer",
+        "correct_answer": "The Salamander",
+        "correct": false,
+        "score_after": 1,
+        "category": "Entertainment: Japanese Anime & Manga",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 6,
+        "user_answer": "Zeus",
+        "correct_answer": "Zeus",
+        "correct": true,
+        "score_after": 2,
+        "category": "Mythology",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 7,
+        "user_answer": "376",
+        "correct_answer": "427",
+        "correct": false,
+        "score_after": 2,
+        "category": "Vehicles",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 8,
+        "user_answer": "Eddie Vedder",
+        "correct_answer": "Eddie Vedder",
+        "correct": true,
+        "score_after": 3,
+        "category": "Entertainment: Music",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 9,
+        "user_answer": "Elite Crew",
+        "correct_answer": "Midwest Militia",
+        "correct": false,
+        "score_after": 3,
+        "category": "Entertainment: Video Games",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 10,
+        "user_answer": "Vilnius",
+        "correct_answer": "Kaunas",
+        "correct": false,
+        "score_after": 3,
+        "category": "Geography",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 11,
+        "user_answer": "Mausoleum of Maussollos",
+        "correct_answer": "Petra",
+        "correct": false,
+        "score_after": 3,
+        "category": "Entertainment: Video Games",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 12,
+        "user_answer": "F40",
+        "correct_answer": "Testarossa",
+        "correct": false,
+        "score_after": 3,
+        "category": "Vehicles",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 13,
+        "user_answer": "51",
+        "correct_answer": "49",
+        "correct": false,
+        "score_after": 3,
+        "category": "Geography",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 14,
+        "user_answer": "Hindi",
+        "correct_answer": "Finnish",
+        "correct": false,
+        "score_after": 3,
+        "category": "History",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 15,
+        "user_answer": "Auguste Rodin",
+        "correct_answer": "Fr\u00e9d\u00e9ric Auguste Bartholdi",
+        "correct": false,
+        "score_after": 3,
+        "category": "Art",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 16,
+        "user_answer": "Reebok",
+        "correct_answer": "Puma",
+        "correct": false,
+        "score_after": 3,
+        "category": "Sports",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 17,
+        "user_answer": "Ursus Arctos",
+        "correct_answer": "Ursus Maritimus",
+        "correct": false,
+        "score_after": 3,
+        "category": "Animals",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 18,
+        "user_answer": "Kyle McCarley",
+        "correct_answer": "Chris Niosi",
+        "correct": false,
+        "score_after": 3,
+        "category": "Entertainment: Japanese Anime & Manga",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 19,
+        "user_answer": "Vegetables",
+        "correct_answer": "Trees",
+        "correct": false,
+        "score_after": 3,
+        "category": "General Knowledge",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 20,
+        "user_answer": "100 Hz",
+        "correct_answer": "80 Hz",
+        "correct": false,
+        "score_after": 3,
+        "category": "Science: Gadgets",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 21,
+        "user_answer": "212\u00b0F",
+        "correct_answer": "212\u00b0F",
+        "correct": true,
+        "score_after": 4,
+        "category": "Science & Nature",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 22,
+        "user_answer": "The Griffins",
+        "correct_answer": "The Griffins",
+        "correct": true,
+        "score_after": 5,
+        "category": "Entertainment: Cartoon & Animations",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 23,
+        "user_answer": "Operation Downfall",
+        "correct_answer": "Operation Downfall",
+        "correct": true,
+        "score_after": 6,
+        "category": "History",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 24,
+        "user_answer": "November 14, 2008",
+        "correct_answer": "April 24, 2012",
+        "correct": false,
+        "score_after": 6,
+        "category": "General Knowledge",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 25,
+        "user_answer": "Fall Out Boy",
+        "correct_answer": "Fall Out Boy",
+        "correct": true,
+        "score_after": 7,
+        "category": "Entertainment: Music",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 26,
+        "user_answer": "Every Villain Is Lemons",
+        "correct_answer": "Every Villain Is Lemons",
+        "correct": true,
+        "score_after": 8,
+        "category": "Entertainment: Television",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 27,
+        "user_answer": "Michael Crichton",
+        "correct_answer": "Michael Crichton",
+        "correct": true,
+        "score_after": 9,
+        "category": "General Knowledge",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 28,
+        "user_answer": "Toy Story",
+        "correct_answer": "Aladdin",
+        "correct": false,
+        "score_after": 9,
+        "category": "Entertainment: Film",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 29,
+        "user_answer": "Justin Bieber, Purpose",
+        "correct_answer": "Adele, 25",
+        "correct": false,
+        "score_after": 9,
+        "category": "Entertainment: Music",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 30,
+        "user_answer": "L\u00f6ffel",
+        "correct_answer": "L\u00f6ffel",
+        "correct": true,
+        "score_after": 10,
+        "category": "General Knowledge",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 31,
+        "user_answer": "Harvester Troll",
+        "correct_answer": "Uthden Troll",
+        "correct": false,
+        "score_after": 10,
+        "category": "Entertainment: Board Games",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 32,
+        "user_answer": "Jhin",
+        "correct_answer": "Jhin",
+        "correct": true,
+        "score_after": 11,
+        "category": "Entertainment: Video Games",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 33,
+        "user_answer": "Croix Meridies",
+        "correct_answer": "Ursula Callistis",
+        "correct": false,
+        "score_after": 11,
+        "category": "Entertainment: Japanese Anime & Manga",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 34,
+        "user_answer": "Rudyard Kipling",
+        "correct_answer": "Rudyard Kipling",
+        "correct": true,
+        "score_after": 12,
+        "category": "Entertainment: Books",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 35,
+        "user_answer": "EA Black Box",
+        "correct_answer": "Criterion Games",
+        "correct": false,
+        "score_after": 12,
+        "category": "Entertainment: Video Games",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 36,
+        "user_answer": "Delta Squad",
+        "correct_answer": "Delta Squad",
+        "correct": true,
+        "score_after": 13,
+        "category": "Entertainment: Video Games",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 37,
+        "user_answer": "$100",
+        "correct_answer": "$5",
+        "correct": false,
+        "score_after": 13,
+        "category": "Entertainment: Television",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 38,
+        "user_answer": "Tom Bombadil",
+        "correct_answer": "Tom Bombadil",
+        "correct": true,
+        "score_after": 14,
+        "category": "Entertainment: Film",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 39,
+        "user_answer": "Studio 3hz",
+        "correct_answer": "Kinema Citrus",
+        "correct": false,
+        "score_after": 14,
+        "category": "Entertainment: Japanese Anime & Manga",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 40,
+        "user_answer": "Carl Jung",
+        "correct_answer": "Carl Jung",
+        "correct": true,
+        "score_after": 15,
+        "category": "Science & Nature",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 41,
+        "user_answer": "Celeste",
+        "correct_answer": "Madonna",
+        "correct": false,
+        "score_after": 15,
+        "category": "Entertainment: Video Games",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 42,
+        "user_answer": "Appelus delectica",
+        "correct_answer": "Malus pumila",
+        "correct": false,
+        "score_after": 15,
+        "category": "Science & Nature",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 43,
+        "user_answer": "Production I.G",
+        "correct_answer": "A-1 Pictures",
+        "correct": false,
+        "score_after": 15,
+        "category": "Entertainment: Japanese Anime & Manga",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 44,
+        "user_answer": "Lucy in the Sky with Diamonds",
+        "correct_answer": "Strawberry Fields Forever",
+        "correct": false,
+        "score_after": 15,
+        "category": "Entertainment: Music",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 45,
+        "user_answer": "Jotaro Kujo",
+        "correct_answer": "Jotaro Kujo",
+        "correct": true,
+        "score_after": 16,
+        "category": "Entertainment: Japanese Anime & Manga",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 46,
+        "user_answer": "Vietnam War",
+        "correct_answer": "World War II",
+        "correct": false,
+        "score_after": 16,
+        "category": "Entertainment: Video Games",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 47,
+        "user_answer": "Ethel",
+        "correct_answer": "Joani",
+        "correct": false,
+        "score_after": 16,
+        "category": "Entertainment: Comics",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 48,
+        "user_answer": "USS North Carolina",
+        "correct_answer": "USS Pueblo",
+        "correct": false,
+        "score_after": 16,
+        "category": "History",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 49,
+        "user_answer": "Stern",
+        "correct_answer": "Starboard",
+        "correct": false,
+        "score_after": 16,
+        "category": "General Knowledge",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 50,
+        "user_answer": "To measure",
+        "correct_answer": "To know",
+        "correct": false,
+        "score_after": 16,
+        "category": "Science & Nature",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 51,
+        "user_answer": "Zambia",
+        "correct_answer": "Rhodesia",
+        "correct": false,
+        "score_after": 16,
+        "category": "Geography",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 1,
+        "user_answer": "Romy Madley Croft",
+        "correct_answer": "Jamie xx",
+        "correct": false,
+        "score_after": 0,
+        "category": "Entertainment: Music",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 2,
+        "user_answer": "Paul",
+        "correct_answer": "John",
+        "correct": false,
+        "score_after": 0,
+        "category": "Entertainment: Music",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 3,
+        "user_answer": "Boston Bruins",
+        "correct_answer": "Boston Bruins",
+        "correct": true,
+        "score_after": 1,
+        "category": "Sports",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 4,
+        "user_answer": "#025",
+        "correct_answer": "#025",
+        "correct": true,
+        "score_after": 2,
+        "category": "Entertainment: Video Games",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 5,
+        "user_answer": "Gag reflex",
+        "correct_answer": "Ankle jerk reflex",
+        "correct": false,
+        "score_after": 2,
+        "category": "Science & Nature",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 6,
+        "user_answer": "Cheetah",
+        "correct_answer": "Cheetah",
+        "correct": true,
+        "score_after": 3,
+        "category": "Animals",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 7,
+        "user_answer": "Ymir",
+        "correct_answer": "Nidhogg",
+        "correct": false,
+        "score_after": 3,
+        "category": "Mythology",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 8,
+        "user_answer": "Glindor",
+        "correct_answer": "Gielinor",
+        "correct": false,
+        "score_after": 3,
+        "category": "Entertainment: Video Games",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 9,
+        "user_answer": "Defense of the Ancients",
+        "correct_answer": "Defense of the Ancients",
+        "correct": true,
+        "score_after": 4,
+        "category": "Entertainment: Video Games",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 10,
+        "user_answer": "Oculus",
+        "correct_answer": "HTC",
+        "correct": false,
+        "score_after": 4,
+        "category": "General Knowledge",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 1,
+        "user_answer": "Cloud Dispersal System",
+        "correct_answer": "The Cloudburst",
+        "correct": false,
+        "score_after": 0,
+        "category": "Entertainment: Video Games",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 2,
+        "user_answer": "Labyrinth",
+        "correct_answer": "Highlander",
+        "correct": false,
+        "score_after": 0,
+        "category": "Entertainment: Film",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 3,
+        "user_answer": "Home Alone",
+        "correct_answer": "Ghostbusters",
+        "correct": false,
+        "score_after": 0,
+        "category": "Entertainment: Film",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 4,
+        "user_answer": "Mental Health Issues",
+        "correct_answer": "Mental Health Issues",
+        "correct": true,
+        "score_after": 1,
+        "category": "Entertainment: Video Games",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 5,
+        "user_answer": "1955",
+        "correct_answer": "1936",
+        "correct": false,
+        "score_after": 1,
+        "category": "Entertainment: Television",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 6,
+        "user_answer": "November 1943",
+        "correct_answer": "January 1944",
+        "correct": false,
+        "score_after": 1,
+        "category": "History",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 7,
+        "user_answer": "Red and Blue",
+        "correct_answer": "Red and Green",
+        "correct": false,
+        "score_after": 1,
+        "category": "Entertainment: Video Games",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 8,
+        "user_answer": "100,000",
+        "correct_answer": "350,000",
+        "correct": false,
+        "score_after": 1,
+        "category": "History",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 9,
+        "user_answer": "Twin Peaks Fire Walk With Me",
+        "correct_answer": "The Straight Story",
+        "correct": false,
+        "score_after": 1,
+        "category": "Entertainment: Film",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 10,
+        "user_answer": "Intel 486SX",
+        "correct_answer": "Intel 4004",
+        "correct": false,
+        "score_after": 1,
+        "category": "Science: Computers",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 11,
+        "user_answer": "Starboard",
+        "correct_answer": "Port",
+        "correct": false,
+        "score_after": 1,
+        "category": "General Knowledge",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 12,
+        "user_answer": "Mercy",
+        "correct_answer": "More questions",
+        "correct": false,
+        "score_after": 1,
+        "category": "Entertainment: Video Games",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 13,
+        "user_answer": "7",
+        "correct_answer": "7",
+        "correct": true,
+        "score_after": 2,
+        "category": "Science: Mathematics",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 14,
+        "user_answer": "high, all",
+        "correct_answer": "low, all",
+        "correct": false,
+        "score_after": 2,
+        "category": "Science & Nature",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 15,
+        "user_answer": "Jesus Quintero",
+        "correct_answer": "Juan Joya Borga",
+        "correct": false,
+        "score_after": 2,
+        "category": "Entertainment: Television",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 16,
+        "user_answer": "Wuthering Heights",
+        "correct_answer": "Moby Dick",
+        "correct": false,
+        "score_after": 2,
+        "category": "Entertainment: Books",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 17,
+        "user_answer": "8",
+        "correct_answer": "7",
+        "correct": false,
+        "score_after": 2,
+        "category": "Entertainment: Video Games",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 18,
+        "user_answer": "Mariana Trench",
+        "correct_answer": "Grand Banks",
+        "correct": false,
+        "score_after": 2,
+        "category": "Geography",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 19,
+        "user_answer": "Caspian Sea",
+        "correct_answer": "Lake Superior ",
+        "correct": false,
+        "score_after": 2,
+        "category": "Geography",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 20,
+        "user_answer": "Kirby",
+        "correct_answer": "Donkey Kong",
+        "correct": false,
+        "score_after": 2,
+        "category": "Entertainment: Video Games",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 21,
+        "user_answer": "The Tank",
+        "correct_answer": "The Witch",
+        "correct": false,
+        "score_after": 2,
+        "category": "Entertainment: Video Games",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 22,
+        "user_answer": "Tony Hawk's Pro Skater 3",
+        "correct_answer": "Tiger Woods 99 PGA Tour",
+        "correct": false,
+        "score_after": 2,
+        "category": "Entertainment: Video Games",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 23,
+        "user_answer": "Jerome Caulfield",
+        "correct_answer": "Holden Caulfield",
+        "correct": false,
+        "score_after": 2,
+        "category": "Entertainment: Books",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 24,
+        "user_answer": "Watt",
+        "correct_answer": "Farad",
+        "correct": false,
+        "score_after": 2,
+        "category": "Science & Nature",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 25,
+        "user_answer": "Ilsa Haupstein",
+        "correct_answer": "Karl Ruprecht Kroenen",
+        "correct": false,
+        "score_after": 2,
+        "category": "Entertainment: Film",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 26,
+        "user_answer": "1986",
+        "correct_answer": "1995",
+        "correct": false,
+        "score_after": 2,
+        "category": "Celebrities",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 27,
+        "user_answer": "Journey to the Center of the Earth",
+        "correct_answer": "Journey to the Center of the Earth",
+        "correct": true,
+        "score_after": 3,
+        "category": "Entertainment: Books",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 28,
+        "user_answer": "The Stone Brothers",
+        "correct_answer": "The Slag Brothers",
+        "correct": false,
+        "score_after": 3,
+        "category": "Entertainment: Cartoon & Animations",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 29,
+        "user_answer": "Donkey Kong Country",
+        "correct_answer": "Slalom",
+        "correct": false,
+        "score_after": 3,
+        "category": "Entertainment: Video Games",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 30,
+        "user_answer": "Netscape Navigator",
+        "correct_answer": "BackRub",
+        "correct": false,
+        "score_after": 3,
+        "category": "General Knowledge",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 31,
+        "user_answer": "1UZ-FE",
+        "correct_answer": "1UZ-FE",
+        "correct": true,
+        "score_after": 4,
+        "category": "Vehicles",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 32,
+        "user_answer": "Athena",
+        "correct_answer": "Any god they wanted",
+        "correct": false,
+        "score_after": 4,
+        "category": "History",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 33,
+        "user_answer": "Nine Inch Nails",
+        "correct_answer": "Nine Inch Nails",
+        "correct": true,
+        "score_after": 5,
+        "category": "Entertainment: Music",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 34,
+        "user_answer": "Garry's Mod",
+        "correct_answer": "Counter-Strike: Source",
+        "correct": false,
+        "score_after": 5,
+        "category": "Entertainment: Video Games",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 35,
+        "user_answer": "Finland",
+        "correct_answer": "Sweden",
+        "correct": false,
+        "score_after": 5,
+        "category": "Entertainment: Music",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 36,
+        "user_answer": "River Horse (Latin)",
+        "correct_answer": "River Horse (Greek)",
+        "correct": false,
+        "score_after": 5,
+        "category": "Animals",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 37,
+        "user_answer": "Terisiare",
+        "correct_answer": "Terisiare",
+        "correct": true,
+        "score_after": 6,
+        "category": "Entertainment: Books",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 38,
+        "user_answer": "2013",
+        "correct_answer": "2013",
+        "correct": true,
+        "score_after": 7,
+        "category": "Entertainment: Video Games",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 39,
+        "user_answer": "Mormon",
+        "correct_answer": "Mormon",
+        "correct": true,
+        "score_after": 8,
+        "category": "History",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 40,
+        "user_answer": "Metropolis",
+        "correct_answer": "Star City",
+        "correct": false,
+        "score_after": 8,
+        "category": "General Knowledge",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 41,
+        "user_answer": "Nancy Davis",
+        "correct_answer": "Ivana Zeln\u00ed\u010dkov\u00e1",
+        "correct": false,
+        "score_after": 8,
+        "category": "Celebrities",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 42,
+        "user_answer": "Rathalos",
+        "correct_answer": "Ceadeus",
+        "correct": false,
+        "score_after": 8,
+        "category": "Entertainment: Video Games",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 43,
+        "user_answer": "Burial",
+        "correct_answer": "Burial",
+        "correct": true,
+        "score_after": 9,
+        "category": "Entertainment: Music",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 44,
+        "user_answer": "Yellow",
+        "correct_answer": "Green",
+        "correct": false,
+        "score_after": 9,
+        "category": "Science: Computers",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 45,
+        "user_answer": "Stadium Arcadium",
+        "correct_answer": "Blood Sugar Sex Magik",
+        "correct": false,
+        "score_after": 9,
+        "category": "Entertainment: Music",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 46,
+        "user_answer": "212\u00b0F",
+        "correct_answer": "212\u00b0F",
+        "correct": true,
+        "score_after": 10,
+        "category": "Science & Nature",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 48,
+        "user_answer": "3",
+        "correct_answer": "2",
+        "correct": false,
+        "score_after": 10,
+        "category": "Science: Mathematics",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 49,
+        "user_answer": "Jason",
+        "correct_answer": "Jason",
+        "correct": true,
+        "score_after": 11,
+        "category": "Mythology",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 50,
+        "user_answer": "Faridabad",
+        "correct_answer": "Agra",
+        "correct": false,
+        "score_after": 11,
+        "category": "Geography",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 51,
+        "user_answer": "Professor",
+        "correct_answer": "Model",
+        "correct": false,
+        "score_after": 11,
+        "category": "General Knowledge",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 52,
+        "user_answer": "Karl Marx",
+        "correct_answer": "Karl Marx",
+        "correct": true,
+        "score_after": 12,
+        "category": "History",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 53,
+        "user_answer": "Jakarta",
+        "correct_answer": "Jakarta",
+        "correct": true,
+        "score_after": 13,
+        "category": "Geography",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 54,
+        "user_answer": "Red",
+        "correct_answer": "Red",
+        "correct": true,
+        "score_after": 14,
+        "category": "Entertainment: Japanese Anime & Manga",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 55,
+        "user_answer": "Sophie",
+        "correct_answer": "Sophie",
+        "correct": true,
+        "score_after": 15,
+        "category": "Entertainment: Video Games",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 56,
+        "user_answer": "Schweizerische Nationalbahnen",
+        "correct_answer": "Schweizerische Bundesbahnen",
+        "correct": false,
+        "score_after": 15,
+        "category": "Geography",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 57,
+        "user_answer": "Polar bears",
+        "correct_answer": "Polar bears",
+        "correct": true,
+        "score_after": 16,
+        "category": "Entertainment: Video Games",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 58,
+        "user_answer": "4.5 Billion Years",
+        "correct_answer": "13.8 Billion Years",
+        "correct": false,
+        "score_after": 16,
+        "category": "Science & Nature",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 59,
+        "user_answer": "Strength",
+        "correct_answer": "Flash",
+        "correct": false,
+        "score_after": 16,
+        "category": "Entertainment: Video Games",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 60,
+        "user_answer": "GMC",
+        "correct_answer": "Ducati",
+        "correct": false,
+        "score_after": 16,
+        "category": "General Knowledge",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 61,
+        "user_answer": "Jennifer Maxwell",
+        "correct_answer": "Jennifer Simpson",
+        "correct": false,
+        "score_after": 16,
+        "category": "Entertainment: Video Games",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 62,
+        "user_answer": "Toys in the Attic",
+        "correct_answer": "Toys in the Attic",
+        "correct": true,
+        "score_after": 17,
+        "category": "Entertainment: Music",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 63,
+        "user_answer": "Arby's",
+        "correct_answer": "Arby's",
+        "correct": true,
+        "score_after": 18,
+        "category": "General Knowledge",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 64,
+        "user_answer": "Halo 3: Helljumpers",
+        "correct_answer": "Halo 3: Recon",
+        "correct": false,
+        "score_after": 18,
+        "category": "Entertainment: Video Games",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 65,
+        "user_answer": "Global Meridian Time",
+        "correct_answer": "Greenwich Mean Time",
+        "correct": false,
+        "score_after": 18,
+        "category": "General Knowledge",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 73,
+        "user_answer": "Romans Go Home",
+        "correct_answer": "Romani Ite Domum",
+        "correct": false,
+        "score_after": 18,
+        "category": "Entertainment: Film",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 77,
+        "user_answer": "The Milky Way Galaxy",
+        "correct_answer": "The Milky Way Galaxy",
+        "correct": true,
+        "score_after": 19,
+        "category": "General Knowledge",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 78,
+        "user_answer": "Asura ",
+        "correct_answer": "Tengu",
+        "correct": false,
+        "score_after": 19,
+        "category": "Entertainment: Video Games",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 79,
+        "user_answer": "GLaDOS",
+        "correct_answer": "GLaDOS",
+        "correct": true,
+        "score_after": 20,
+        "category": "Entertainment: Video Games",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 80,
+        "user_answer": "Portugal",
+        "correct_answer": "Portugal",
+        "correct": true,
+        "score_after": 21,
+        "category": "History",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 81,
+        "user_answer": "Xebec",
+        "correct_answer": "Satelite",
+        "correct": false,
+        "score_after": 21,
+        "category": "Entertainment: Japanese Anime & Manga",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 82,
+        "user_answer": "Turn on the light",
+        "correct_answer": "Enable cameras",
+        "correct": false,
+        "score_after": 21,
+        "category": "Entertainment: Video Games",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 83,
+        "user_answer": "Marlene Dietrich",
+        "correct_answer": "Mae West",
+        "correct": false,
+        "score_after": 21,
+        "category": "Entertainment: Music",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 84,
+        "user_answer": "Go",
+        "correct_answer": "Senet",
+        "correct": false,
+        "score_after": 21,
+        "category": "Entertainment: Board Games",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 85,
+        "user_answer": "Final Fantasy: Reborn",
+        "correct_answer": "Final Fantasy Versus XIII",
+        "correct": false,
+        "score_after": 21,
+        "category": "Entertainment: Video Games",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 86,
+        "user_answer": "18",
+        "correct_answer": "4",
+        "correct": false,
+        "score_after": 21,
+        "category": "Entertainment: Music",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 87,
+        "user_answer": "Down Syndrome",
+        "correct_answer": "Jacob's Syndrome",
+        "correct": false,
+        "score_after": 21,
+        "category": "Science & Nature",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 88,
+        "user_answer": "Cancer",
+        "correct_answer": "Cancer",
+        "correct": true,
+        "score_after": 22,
+        "category": "General Knowledge",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 89,
+        "user_answer": "2011",
+        "correct_answer": "2011",
+        "correct": true,
+        "score_after": 23,
+        "category": "Entertainment: Video Games",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 90,
+        "user_answer": "X-01",
+        "correct_answer": "T-45",
+        "correct": false,
+        "score_after": 23,
+        "category": "Entertainment: Video Games",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 91,
+        "user_answer": "A yoga posture",
+        "correct_answer": "A body pillow",
+        "correct": false,
+        "score_after": 23,
+        "category": "General Knowledge",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 92,
+        "user_answer": "Dragon's Lair",
+        "correct_answer": "Astron Belt",
+        "correct": false,
+        "score_after": 23,
+        "category": "Entertainment: Video Games",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 93,
+        "user_answer": "1972",
+        "correct_answer": "1972",
+        "correct": true,
+        "score_after": 24,
+        "category": "Politics",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 94,
+        "user_answer": "Tetris",
+        "correct_answer": "Tetris",
+        "correct": true,
+        "score_after": 25,
+        "category": "Entertainment: Video Games",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 95,
+        "user_answer": "Harpies",
+        "correct_answer": "Harpies",
+        "correct": true,
+        "score_after": 26,
+        "category": "Mythology",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 96,
+        "user_answer": "McLaren F1",
+        "correct_answer": "Toyota MR2",
+        "correct": false,
+        "score_after": 26,
+        "category": "Entertainment: Video Games",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 97,
+        "user_answer": "Germany",
+        "correct_answer": "Germany",
+        "correct": true,
+        "score_after": 27,
+        "category": "Sports",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 98,
+        "user_answer": "Rajesh",
+        "correct_answer": "Wolowizard",
+        "correct": false,
+        "score_after": 27,
+        "category": "Entertainment: Television",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 99,
+        "user_answer": "VY Canis Majoris",
+        "correct_answer": "UY Scuti",
+        "correct": false,
+        "score_after": 27,
+        "category": "Science & Nature",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 100,
+        "user_answer": "Fluffy",
+        "correct_answer": "Fluffy",
+        "correct": true,
+        "score_after": 28,
+        "category": "Entertainment: Books",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 1,
+        "user_answer": "Alec Holowka",
+        "correct_answer": "Alec Holowka",
+        "correct": true,
+        "score_after": 1,
+        "category": "Entertainment: Video Games",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 2,
+        "user_answer": "Mike",
+        "correct_answer": "Mike",
+        "correct": true,
+        "score_after": 2,
+        "category": "General Knowledge",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 3,
+        "user_answer": "Rito",
+        "correct_answer": "Rito",
+        "correct": true,
+        "score_after": 3,
+        "category": "Entertainment: Japanese Anime & Manga",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 4,
+        "user_answer": "Cascading Style Sheet",
+        "correct_answer": "Cascading Style Sheet",
+        "correct": true,
+        "score_after": 4,
+        "category": "Science: Computers",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 5,
+        "user_answer": "Herg\u00e9",
+        "correct_answer": "Herg\u00e9",
+        "correct": true,
+        "score_after": 5,
+        "category": "Entertainment: Comics",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 6,
+        "user_answer": "Tandoori",
+        "correct_answer": "Tandoori",
+        "correct": true,
+        "score_after": 6,
+        "category": "General Knowledge",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 7,
+        "user_answer": "The Bible",
+        "correct_answer": "The Bible",
+        "correct": true,
+        "score_after": 7,
+        "category": "Entertainment: Video Games",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 8,
+        "user_answer": "F10",
+        "correct_answer": "E46",
+        "correct": false,
+        "score_after": 7,
+        "category": "Vehicles",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 9,
+        "user_answer": "N\u00fcrnberg",
+        "correct_answer": "N\u00fcrnberg",
+        "correct": true,
+        "score_after": 8,
+        "category": "Art",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 10,
+        "user_answer": "Robin Williams",
+        "correct_answer": "Robin Williams",
+        "correct": true,
+        "score_after": 9,
+        "category": "Entertainment: Cartoon & Animations",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 11,
+        "user_answer": "Thelma and Louise",
+        "correct_answer": "The Rocky Horror Picture Show",
+        "correct": false,
+        "score_after": 9,
+        "category": "Entertainment: Film",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 12,
+        "user_answer": "Half-Life",
+        "correct_answer": "Half-Life",
+        "correct": true,
+        "score_after": 10,
+        "category": "Entertainment: Video Games",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 13,
+        "user_answer": "Mark Knopfler",
+        "correct_answer": "David Gilmour",
+        "correct": false,
+        "score_after": 10,
+        "category": "Entertainment: Music",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 1,
+        "user_answer": "What a Wonderful World",
+        "correct_answer": "Over the Rainbow",
+        "correct": false,
+        "score_after": 0,
+        "category": "Entertainment: Japanese Anime & Manga",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 1,
+        "user_answer": "When You Wish Upon A Star",
+        "correct_answer": "Over the Rainbow",
+        "correct": false,
+        "score_after": 0,
+        "category": "Entertainment: Japanese Anime & Manga",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 1,
+        "user_answer": "Singing In The Rain",
+        "correct_answer": "Over the Rainbow",
+        "correct": false,
+        "score_after": 0,
+        "category": "Entertainment: Japanese Anime & Manga",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 1,
+        "user_answer": "What a Wonderful World",
+        "correct_answer": "Over the Rainbow",
+        "correct": false,
+        "score_after": 0,
+        "category": "Entertainment: Japanese Anime & Manga",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 1,
+        "user_answer": "Over the Rainbow",
+        "correct_answer": "Over the Rainbow",
+        "correct": true,
+        "score_after": 1,
+        "category": "Entertainment: Japanese Anime & Manga",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 1,
+        "user_answer": "Singing In The Rain",
+        "correct_answer": "Over the Rainbow",
+        "correct": false,
+        "score_after": 1,
+        "category": "Entertainment: Japanese Anime & Manga",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 1,
+        "user_answer": "City 18",
+        "correct_answer": "City 17",
+        "correct": false,
+        "score_after": 0,
+        "category": "Entertainment: Video Games",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 2,
+        "user_answer": "Benito Ju\u00e1rez",
+        "correct_answer": "Jos\u00e9 Rizal",
+        "correct": false,
+        "score_after": 0,
+        "category": "History",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 3,
+        "user_answer": "Nokia Tune",
+        "correct_answer": "Nokia Tune",
+        "correct": true,
+        "score_after": 1,
+        "category": "Entertainment: Music",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 4,
+        "user_answer": "George Gershwin",
+        "correct_answer": "George Gershwin",
+        "correct": true,
+        "score_after": 2,
+        "category": "Entertainment: Music",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 5,
+        "user_answer": "Arwen",
+        "correct_answer": "Glorfindel",
+        "correct": false,
+        "score_after": 2,
+        "category": "Entertainment: Books",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 6,
+        "user_answer": "5%",
+        "correct_answer": "5%",
+        "correct": true,
+        "score_after": 3,
+        "category": "History",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 7,
+        "user_answer": "1.2 billion USD",
+        "correct_answer": "1.2 billion USD",
+        "correct": true,
+        "score_after": 4,
+        "category": "Entertainment: Film",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 1,
+        "user_answer": "Ira Glass",
+        "correct_answer": "Ben Shapiro",
+        "correct": false,
+        "score_after": 0,
+        "category": "General Knowledge",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 3,
+        "user_answer": "30 FPS",
+        "correct_answer": "24 FPS",
+        "correct": false,
+        "score_after": 0,
+        "category": "Entertainment: Cartoon & Animations",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 5,
+        "user_answer": "Rubik\u2019s Cube",
+        "correct_answer": "Cabbage Patch Kids",
+        "correct": false,
+        "score_after": 0,
+        "category": "General Knowledge",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 6,
+        "user_answer": "Dave Grohl",
+        "correct_answer": "Dave Grohl",
+        "correct": true,
+        "score_after": 1,
+        "category": "Entertainment: Music",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 1,
+        "user_answer": "1984",
+        "correct_answer": "1986",
+        "correct": false,
+        "score_after": 0,
+        "category": "Entertainment: Film",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 2,
+        "user_answer": "24601",
+        "correct_answer": "24601",
+        "correct": true,
+        "score_after": 1,
+        "category": "Entertainment: Musicals & Theatres",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 3,
+        "user_answer": "Phoenix, Arizona",
+        "correct_answer": "San Francisco, California",
+        "correct": false,
+        "score_after": 1,
+        "category": "Geography",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 4,
+        "user_answer": "Outro",
+        "correct_answer": "Midnight City",
+        "correct": false,
+        "score_after": 1,
+        "category": "Entertainment: Music",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 5,
+        "user_answer": "E46",
+        "correct_answer": "E46",
+        "correct": true,
+        "score_after": 2,
+        "category": "Vehicles",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 7,
+        "user_answer": "California",
+        "correct_answer": "Alaska",
+        "correct": false,
+        "score_after": 2,
+        "category": "Geography",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 1,
+        "user_answer": "Archimedes",
+        "correct_answer": "Archimedes",
+        "correct": true,
+        "score_after": 1,
+        "category": "Science: Mathematics",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 2,
+        "user_answer": "Macbeth",
+        "correct_answer": "Hamlet",
+        "correct": false,
+        "score_after": 1,
+        "category": "Entertainment: Musicals & Theatres",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 3,
+        "user_answer": "2",
+        "correct_answer": "2",
+        "correct": true,
+        "score_after": 2,
+        "category": "Science: Mathematics",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 4,
+        "user_answer": "3",
+        "correct_answer": "3",
+        "correct": true,
+        "score_after": 3,
+        "category": "Politics",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 5,
+        "user_answer": "Programmable Sound Generator (PSG)",
+        "correct_answer": "ADPCM Sampler",
+        "correct": false,
+        "score_after": 3,
+        "category": "Science: Computers",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 6,
+        "user_answer": "pointed arch",
+        "correct_answer": "pointed arch",
+        "correct": true,
+        "score_after": 4,
+        "category": "Art",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 7,
+        "user_answer": "1994",
+        "correct_answer": "1995",
+        "correct": false,
+        "score_after": 4,
+        "category": "Entertainment: Music",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 8,
+        "user_answer": "June",
+        "correct_answer": "June",
+        "correct": true,
+        "score_after": 5,
+        "category": "Entertainment: Books",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 9,
+        "user_answer": "United States of America",
+        "correct_answer": "Canada",
+        "correct": false,
+        "score_after": 5,
+        "category": "Science: Gadgets",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 10,
+        "user_answer": "Sweden",
+        "correct_answer": "Scotland",
+        "correct": false,
+        "score_after": 5,
+        "category": "Entertainment: Television",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 11,
+        "user_answer": "Vincent van Gogh",
+        "correct_answer": "Vincent van Gogh",
+        "correct": true,
+        "score_after": 6,
+        "category": "Art",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 13,
+        "user_answer": "Red",
+        "correct_answer": "Red",
+        "correct": true,
+        "score_after": 7,
+        "category": "Entertainment: Japanese Anime & Manga",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 14,
+        "user_answer": "10-sided die",
+        "correct_answer": "10-sided die",
+        "correct": true,
+        "score_after": 8,
+        "category": "Science: Mathematics",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 16,
+        "user_answer": "A-1 Pictures",
+        "correct_answer": "Bones",
+        "correct": false,
+        "score_after": 8,
+        "category": "Entertainment: Japanese Anime & Manga",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 17,
+        "user_answer": "a series focused on color and light as opposed to line and shape",
+        "correct_answer": "utilitarian objects elevated to the status of art",
+        "correct": false,
+        "score_after": 8,
+        "category": "Art",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 1,
+        "user_answer": "2B",
+        "correct_answer": "A1",
+        "correct": false,
+        "score_after": 0,
+        "category": "Entertainment: Video Games",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 2,
+        "user_answer": "Sacramento, California",
+        "correct_answer": "Rosemead, California",
+        "correct": false,
+        "score_after": 0,
+        "category": "Geography",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 3,
+        "user_answer": "360",
+        "correct_answer": "360",
+        "correct": true,
+        "score_after": 1,
+        "category": "Science: Mathematics",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 5,
+        "user_answer": "Message In A Bottle",
+        "correct_answer": "Pathfinder",
+        "correct": false,
+        "score_after": 1,
+        "category": "Entertainment: Television",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 6,
+        "user_answer": "Thomas M\u00fcller",
+        "correct_answer": "James Rodr\u00edguez",
+        "correct": false,
+        "score_after": 1,
+        "category": "Sports",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 8,
+        "user_answer": "An motorcycle",
+        "correct_answer": "A robot",
+        "correct": false,
+        "score_after": 1,
+        "category": "Science: Gadgets",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 10,
+        "user_answer": "Perseus",
+        "correct_answer": "Orpheus",
+        "correct": false,
+        "score_after": 1,
+        "category": "Mythology",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 11,
+        "user_answer": "Australia",
+        "correct_answer": "Austria",
+        "correct": false,
+        "score_after": 1,
+        "category": "Vehicles",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 12,
+        "user_answer": "Naily",
+        "correct_answer": "Blakey",
+        "correct": false,
+        "score_after": 1,
+        "category": "Entertainment: Television",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 1,
+        "user_answer": "Janet Jackson",
+        "correct_answer": "Levi Stubbs",
+        "correct": false,
+        "score_after": 0,
+        "category": "Entertainment: Cartoon & Animations",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 2,
+        "user_answer": "Saitama",
+        "correct_answer": "Saitama",
+        "correct": true,
+        "score_after": 1,
+        "category": "Entertainment: Japanese Anime & Manga",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 3,
+        "user_answer": "Bridgestone",
+        "correct_answer": "Pirelli",
+        "correct": false,
+        "score_after": 1,
+        "category": "Vehicles",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 4,
+        "user_answer": "Hotel Hell",
+        "correct_answer": "Auction Hunters",
+        "correct": false,
+        "score_after": 1,
+        "category": "Celebrities",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 5,
+        "user_answer": "Peru",
+        "correct_answer": "Peru",
+        "correct": true,
+        "score_after": 2,
+        "category": "Entertainment: Books",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 6,
+        "user_answer": "Catherine Zeta-Jones",
+        "correct_answer": "Catherine Zeta-Jones",
+        "correct": true,
+        "score_after": 3,
+        "category": "Celebrities",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 8,
+        "user_answer": "4",
+        "correct_answer": "6",
+        "correct": false,
+        "score_after": 3,
+        "category": "Sports",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 10,
+        "user_answer": "Jean Valjean",
+        "correct_answer": "Jean Valjean",
+        "correct": true,
+        "score_after": 4,
+        "category": "Entertainment: Musicals & Theatres",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 11,
+        "user_answer": "Oculus",
+        "correct_answer": "Microsoft",
+        "correct": false,
+        "score_after": 4,
+        "category": "Science: Gadgets",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 12,
+        "user_answer": "September 1, 1939",
+        "correct_answer": "September 1, 1939",
+        "correct": true,
+        "score_after": 5,
+        "category": "History",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 14,
+        "user_answer": "Michael Schumacher",
+        "correct_answer": "Michael Schumacher",
+        "correct": true,
+        "score_after": 6,
+        "category": "Sports",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 15,
+        "user_answer": "Senet",
+        "correct_answer": "Senet",
+        "correct": true,
+        "score_after": 7,
+        "category": "Entertainment: Board Games",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 17,
+        "user_answer": "Franklin D. Roosevelt",
+        "correct_answer": "Grover Cleveland",
+        "correct": false,
+        "score_after": 7,
+        "category": "Politics",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 18,
+        "user_answer": "Sasha Grey",
+        "correct_answer": "Ron Jeremy",
+        "correct": false,
+        "score_after": 7,
+        "category": "Entertainment: Video Games",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 19,
+        "user_answer": "Cubism",
+        "correct_answer": "Neoplasticism",
+        "correct": false,
+        "score_after": 7,
+        "category": "Art",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 20,
+        "user_answer": "Angstrom",
+        "correct_answer": "Metre",
+        "correct": false,
+        "score_after": 7,
+        "category": "Science & Nature",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 21,
+        "user_answer": "Falcon",
+        "correct_answer": "Scorpio",
+        "correct": false,
+        "score_after": 7,
+        "category": "Celebrities",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 22,
+        "user_answer": "Bank of Italy",
+        "correct_answer": "Bank of Italy",
+        "correct": true,
+        "score_after": 8,
+        "category": "General Knowledge",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 24,
+        "user_answer": "Green Arrow",
+        "correct_answer": "Green Arrow",
+        "correct": true,
+        "score_after": 9,
+        "category": "Entertainment: Comics",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 25,
+        "user_answer": "Zhang Jike (China)",
+        "correct_answer": "Ma Long (China)",
+        "correct": false,
+        "score_after": 9,
+        "category": "Sports",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 1,
+        "user_answer": "Salvador Dali",
+        "correct_answer": "Salvador Dali",
+        "correct": true,
+        "score_after": 1,
+        "category": "Art",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 2,
+        "user_answer": "Hamlet",
+        "correct_answer": "Hamlet",
+        "correct": true,
+        "score_after": 2,
+        "category": "Entertainment: Musicals & Theatres",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 3,
+        "user_answer": "Lake Superior ",
+        "correct_answer": "Lake Superior ",
+        "correct": true,
+        "score_after": 3,
+        "category": "Geography",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 6,
+        "user_answer": "24",
+        "correct_answer": "21",
+        "correct": false,
+        "score_after": 3,
+        "category": "Entertainment: Board Games",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 7,
+        "user_answer": "Castling kingside",
+        "correct_answer": "Sacrificing a pawn",
+        "correct": false,
+        "score_after": 3,
+        "category": "Entertainment: Board Games",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 8,
+        "user_answer": "Caldey",
+        "correct_answer": "Anglesey",
+        "correct": false,
+        "score_after": 3,
+        "category": "Geography",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 9,
+        "user_answer": "Engineer ",
+        "correct_answer": "Engineer ",
+        "correct": true,
+        "score_after": 4,
+        "category": "Entertainment: Board Games",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 10,
+        "user_answer": "2 Months",
+        "correct_answer": "1 Month",
+        "correct": false,
+        "score_after": 4,
+        "category": "General Knowledge",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 11,
+        "user_answer": "Seahorse",
+        "correct_answer": "Seahorse",
+        "correct": true,
+        "score_after": 5,
+        "category": "Animals",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 12,
+        "user_answer": "Azerbaijan",
+        "correct_answer": "Pakistan",
+        "correct": false,
+        "score_after": 5,
+        "category": "Geography",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 13,
+        "user_answer": "1504",
+        "correct_answer": "1504",
+        "correct": true,
+        "score_after": 6,
+        "category": "Art",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 14,
+        "user_answer": "Alan Moore",
+        "correct_answer": "Alan Moore",
+        "correct": true,
+        "score_after": 7,
+        "category": "Entertainment: Comics",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 16,
+        "user_answer": "God of War",
+        "correct_answer": "God of War",
+        "correct": true,
+        "score_after": 8,
+        "category": "History",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 17,
+        "user_answer": "Trigger",
+        "correct_answer": "Kinema Citrus",
+        "correct": false,
+        "score_after": 8,
+        "category": "Entertainment: Japanese Anime & Manga",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 18,
+        "user_answer": "The Phillipines",
+        "correct_answer": "The Phillipines",
+        "correct": true,
+        "score_after": 9,
+        "category": "History",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 19,
+        "user_answer": "3",
+        "correct_answer": "3",
+        "correct": true,
+        "score_after": 10,
+        "category": "Entertainment: Japanese Anime & Manga",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 20,
+        "user_answer": "6",
+        "correct_answer": "7",
+        "correct": false,
+        "score_after": 10,
+        "category": "Entertainment: Video Games",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 21,
+        "user_answer": "Casablanca",
+        "correct_answer": "Casablanca",
+        "correct": true,
+        "score_after": 11,
+        "category": "Geography",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 22,
+        "user_answer": "The Great Gatsby",
+        "correct_answer": "The Grapes of Wrath",
+        "correct": false,
+        "score_after": 11,
+        "category": "Entertainment: Books",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 23,
+        "user_answer": "Tim Drake",
+        "correct_answer": "Dick Grayson",
+        "correct": false,
+        "score_after": 11,
+        "category": "Entertainment: Comics",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 24,
+        "user_answer": "360",
+        "correct_answer": "360",
+        "correct": true,
+        "score_after": 12,
+        "category": "Science: Mathematics",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 25,
+        "user_answer": "207",
+        "correct_answer": "187",
+        "correct": false,
+        "score_after": 12,
+        "category": "Entertainment: Board Games",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 26,
+        "user_answer": "Unreal",
+        "correct_answer": "GoldSrc",
+        "correct": false,
+        "score_after": 12,
+        "category": "Entertainment: Video Games",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 27,
+        "user_answer": "JavaScript",
+        "correct_answer": "JavaScript",
+        "correct": true,
+        "score_after": 13,
+        "category": "Science: Computers",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 28,
+        "user_answer": "Sweden",
+        "correct_answer": "France",
+        "correct": false,
+        "score_after": 13,
+        "category": "Entertainment: Musicals & Theatres",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 29,
+        "user_answer": "The Wall",
+        "correct_answer": "The Wall",
+        "correct": true,
+        "score_after": 14,
+        "category": "Entertainment: Music",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 30,
+        "user_answer": "7",
+        "correct_answer": "7",
+        "correct": true,
+        "score_after": 15,
+        "category": "Science: Mathematics",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 32,
+        "user_answer": "Bard",
+        "correct_answer": "Bard",
+        "correct": true,
+        "score_after": 16,
+        "category": "Entertainment: Books",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 33,
+        "user_answer": "Leonardo da Vinci",
+        "correct_answer": "Leonardo da Vinci",
+        "correct": true,
+        "score_after": 17,
+        "category": "Art",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 34,
+        "user_answer": "2035",
+        "correct_answer": "2035",
+        "correct": true,
+        "score_after": 18,
+        "category": "Celebrities",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 35,
+        "user_answer": "Toronto Maple Leafs",
+        "correct_answer": "Philadelphia Flyers",
+        "correct": false,
+        "score_after": 18,
+        "category": "Sports",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 36,
+        "user_answer": "Dance Dance Revolution",
+        "correct_answer": "Rock Band",
+        "correct": false,
+        "score_after": 18,
+        "category": "General Knowledge",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 37,
+        "user_answer": "7",
+        "correct_answer": "7",
+        "correct": true,
+        "score_after": 19,
+        "category": "Entertainment: Books",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 38,
+        "user_answer": "Vulcan",
+        "correct_answer": "Vulcan",
+        "correct": true,
+        "score_after": 20,
+        "category": "Mythology",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 39,
+        "user_answer": "Contemplate",
+        "correct_answer": "Contemplate",
+        "correct": true,
+        "score_after": 21,
+        "category": "General Knowledge",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 40,
+        "user_answer": "7",
+        "correct_answer": "5",
+        "correct": false,
+        "score_after": 21,
+        "category": "Entertainment: Japanese Anime & Manga",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 41,
+        "user_answer": "Deku",
+        "correct_answer": "Deku",
+        "correct": true,
+        "score_after": 22,
+        "category": "Entertainment: Japanese Anime & Manga",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 42,
+        "user_answer": "Apple",
+        "correct_answer": "Plum",
+        "correct": false,
+        "score_after": 22,
+        "category": "General Knowledge",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 43,
+        "user_answer": " Solid State Drive",
+        "correct_answer": " Solid State Drive",
+        "correct": true,
+        "score_after": 23,
+        "category": "Science: Gadgets",
+        "difficulty": "easy"
+    },
+    {
+        "question_id": 44,
+        "user_answer": "PewDiePie",
+        "correct_answer": "The Angry Video Game Nerd",
+        "correct": false,
+        "score_after": 23,
+        "category": "Celebrities",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 45,
+        "user_answer": "Logan Wolf",
+        "correct_answer": "James Howlett",
+        "correct": false,
+        "score_after": 23,
+        "category": "Entertainment: Comics",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 46,
+        "user_answer": "Andy Gibb",
+        "correct_answer": "Leo Sayer",
+        "correct": false,
+        "score_after": 23,
+        "category": "Entertainment: Music",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 47,
+        "user_answer": "She found it scary.",
+        "correct_answer": "She crawled into it's mouth as a baby.",
+        "correct": false,
+        "score_after": 23,
+        "category": "Entertainment: Japanese Anime & Manga",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 48,
+        "user_answer": "Boris Johnson",
+        "correct_answer": "Theresa May",
+        "correct": false,
+        "score_after": 23,
+        "category": "Politics",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 49,
+        "user_answer": "The Monk by the Sea",
+        "correct_answer": "The Black Sea",
+        "correct": false,
+        "score_after": 23,
+        "category": "Art",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 50,
+        "user_answer": "Himself",
+        "correct_answer": "Stephen Sondheim",
+        "correct": false,
+        "score_after": 23,
+        "category": "Entertainment: Musicals & Theatres",
+        "difficulty": "hard"
+    },
+    {
+        "question_id": 51,
+        "user_answer": "88",
+        "correct_answer": "33",
+        "correct": false,
+        "score_after": 23,
+        "category": "Entertainment: Cartoon & Animations",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 52,
+        "user_answer": "Salvador Dali",
+        "correct_answer": "Salvador Dali",
+        "correct": true,
+        "score_after": 24,
+        "category": "Art",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 54,
+        "user_answer": "Madagascar",
+        "correct_answer": "Brazil",
+        "correct": false,
+        "score_after": 24,
+        "category": "History",
+        "difficulty": "medium"
+    },
+    {
+        "question_id": 55,
+        "user_answer": "1963",
+        "correct_answer": "1961",
+        "correct": false,
+        "score_after": 24,
+        "category": "Sports",
+        "difficulty": "medium"
+    }
+]
