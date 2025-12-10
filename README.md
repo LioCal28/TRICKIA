@@ -4,8 +4,6 @@ TRICKIA is an evolving quiz application designed to adapt dynamically to a userâ
 Built with **Flask (backend)** and **JavaScript (frontend)**, it integrates external trivia APIs to generate diverse questions and tracks user performance to refine difficulty and topic selection over time.
 
 This project began as a simple POC and progressively grew into a structured learning platform with session modes, statistics, theme filters, and interactive visual feedback.
-
-The reason of being of this project was imagining and creating an end-of-formation project that could gather most of the learning of my Python AI Dev Formation at DigitalCity.
 ---
 
 ## ðŸš€ Features
