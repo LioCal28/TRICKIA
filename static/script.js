@@ -27,17 +27,26 @@ themeToggleBtn.addEventListener("click", () => {
     }
 });
 
-// Chargement initial du thème
+// Initial theme
 if (localStorage.getItem("theme") === "dark") {
     document.body.classList.add("dark");
     themeToggleBtn.textContent = "☼ Light mode";
 }
 
 // ----------------------------------------------------
-// AU CHARGEMENT : récupérer les catégories
+// WELCOME SCREEN
+// ----------------------------------------------------
+const welcomeBtn = document.getElementById("welcome-start");
+welcomeBtn.addEventListener("click", () => {
+    document.getElementById("welcome-screen").classList.add("hidden");
+    document.getElementById("mode-selector").classList.remove("hidden");
+});
+
+// ----------------------------------------------------
+// LOAD CATEGORIES ON PAGE LOAD
 // ----------------------------------------------------
 window.addEventListener("load", async () => {
-    // Charger catégories pour le sélecteur de thèmes
+    // Load OpenTrivia categories for theme selector
     try {
         const res = await fetch("https://opentdb.com/api_category.php");
         const categories = (await res.json()).trivia_categories;
@@ -56,7 +65,7 @@ window.addEventListener("load", async () => {
         console.error("Erreur chargement catégories :", err);
     }
 
-    // Tooltip pie chart
+    // Tooltip for pie chart (session-based)
     const canvas = document.getElementById("piechart");
     const tooltip = document.getElementById("chart-tooltip");
 
@@ -74,7 +83,7 @@ window.addEventListener("load", async () => {
 });
 
 // ----------------------------------------------------
-// CHOIX DU MODE DE SESSION
+// SESSION MODE SELECTION
 // ----------------------------------------------------
 document.querySelectorAll(".mode-btn").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -82,14 +91,14 @@ document.querySelectorAll(".mode-btn").forEach(btn => {
         sessionCurrentQuestion = 0;
         sessionCorrectAnswers = 0;
 
-        // Passer à la sélection des thèmes
+        // Go to theme selection
         document.getElementById("mode-selector").classList.add("hidden");
         document.getElementById("theme-selector").classList.remove("hidden");
     });
 });
 
 // ----------------------------------------------------
-// SÉLECTION DES THÈMES
+// THEME SELECTION
 // ----------------------------------------------------
 document.getElementById("save-themes").addEventListener("click", () => {
     allowedThemes = [];
@@ -118,17 +127,31 @@ function updateExcludedPanel() {
 }
 
 // ----------------------------------------------------
-// DÉMARRAGE QUIZ
+// START QUIZ (NEW SESSION)
 // ----------------------------------------------------
-function startQuiz() {
+async function startQuiz() {
+    // Reset session counters
+    sessionCurrentQuestion = 0;
+    sessionCorrectAnswers = 0;
+    lastCorrectGlobal = 0;
+    lastTotalGlobal = 0;
+    drawPieChart(0, 0);
+
+    // Inform backend of new session (reset used questions, score, etc.)
+    try {
+        await fetch("/api/session/start", { method: "POST" });
+    } catch (err) {
+        console.error("Erreur démarrage session backend :", err);
+    }
+
     document.getElementById("theme-selector").classList.add("hidden");
     document.getElementById("quiz-area").classList.remove("hidden");
 
     updateQuestionCounterDisplay();
-    loadStats();
+    loadStats();      // Theme stats + API stats (global)
 }
 
-// Mise à jour affichage "Question X / N"
+// Update text "Question X / N"
 function updateQuestionCounterDisplay() {
     const displayIndex = Math.min(sessionCurrentQuestion + 1, sessionTotalQuestions);
     document.getElementById("q-number").textContent =
@@ -136,12 +159,12 @@ function updateQuestionCounterDisplay() {
 }
 
 // ----------------------------------------------------
-// CHARGER UNE QUESTION
+// LOAD QUESTION
 // ----------------------------------------------------
 document.getElementById("btn-new").addEventListener("click", loadQuestion);
 
 async function loadQuestion() {
-    // Si la session est terminée, ne pas continuer
+    // If session finished, don't continue
     if (sessionCurrentQuestion >= sessionTotalQuestions) {
         endSession();
         return;
@@ -169,7 +192,7 @@ async function loadQuestion() {
 }
 
 // ----------------------------------------------------
-// AFFICHER LA QUESTION + RÉPONSES
+// DISPLAY QUESTION + ANSWERS
 // ----------------------------------------------------
 function displayQuestion(q) {
     document.getElementById("question-text").textContent = q.question;
@@ -189,10 +212,10 @@ function displayQuestion(q) {
 }
 
 // ----------------------------------------------------
-// ENVOYER RÉPONSE
+// SEND ANSWER
 // ----------------------------------------------------
 async function sendAnswer(id, answer) {
-    // Empêcher double clic
+    // Prevent multiple clicks
     disableAnswers();
 
     try {
@@ -204,16 +227,16 @@ async function sendAnswer(id, answer) {
 
         const r = await response.json();
 
-        // Score global
+        // Global score from backend
         document.getElementById("score").textContent = r.score;
 
-        // Statistiques de session
+        // Session stats
         sessionCurrentQuestion += 1;
         if (r.status === "success") {
             sessionCorrectAnswers += 1;
         }
 
-        // Feedback visuel
+        // Feedback text
         const fb = document.getElementById("feedback");
         fb.className = "";
         if (r.status === "success") {
@@ -224,10 +247,16 @@ async function sendAnswer(id, answer) {
             fb.classList.add("feedback-bad");
         }
 
-        // Stats globales + pie chart
+        // Update current source label
+        if (r.source) {
+            const srcLabel = document.getElementById("current-source");
+            srcLabel.textContent = r.source;
+        }
+
+        // Update stats panels + pie chart
         await loadStats();
 
-        // Si la session est terminée, afficher l'écran final
+        // End of session?
         if (sessionCurrentQuestion >= sessionTotalQuestions) {
             endSession();
         } else {
@@ -252,7 +281,7 @@ function enableAnswers() {
 }
 
 // ----------------------------------------------------
-// CHARGER STATISTIQUES + METTRE À JOUR LE CAMEMBERT
+// LOAD THEME STATS + UPDATE PIE CHART + API STATS
 // ----------------------------------------------------
 async function loadStats() {
     try {
@@ -262,13 +291,7 @@ async function loadStats() {
         const list = document.getElementById("stats-list");
         list.innerHTML = "";
 
-        let totalCorrect = 0;
-        let totalQuestions = 0;
-
         stats.forEach(entry => {
-            totalCorrect += entry.correct;
-            totalQuestions += entry.total;
-
             const cls = entry.percent >= 50 ? "stat-good" : "stat-bad";
 
             const li = document.createElement("li");
@@ -280,17 +303,39 @@ async function loadStats() {
             list.appendChild(li);
         });
 
-        lastCorrectGlobal = totalCorrect;
-        lastTotalGlobal = totalQuestions;
+        // Pie chart is now session-based, not global
+        lastCorrectGlobal = sessionCorrectAnswers;
+        lastTotalGlobal = sessionCurrentQuestion;
+        drawPieChart(sessionCorrectAnswers, sessionCurrentQuestion);
 
-        drawPieChart(totalCorrect, totalQuestions);
+        // Load per-API stats
+        await loadApiStats();
     } catch (err) {
         console.error("Erreur chargement stats :", err);
     }
 }
 
+// Load API stats and update API performance panel
+async function loadApiStats() {
+    try {
+        const response = await fetch("/api/api_stats");
+        const stats = await response.json();
+
+        const list = document.getElementById("api-stats-list");
+        list.innerHTML = "";
+
+        stats.forEach(entry => {
+            const li = document.createElement("li");
+            li.textContent = `${entry.source}: ${entry.percent}% (${entry.correct}/${entry.total})`;
+            list.appendChild(li);
+        });
+    } catch (err) {
+        console.error("Erreur chargement stats API :", err);
+    }
+}
+
 // ----------------------------------------------------
-// DESSIN DU DIAGRAMME CAMEMBERT
+// PIE CHART (SESSION-BASED)
 // ----------------------------------------------------
 function drawPieChart(correct, total) {
     const canvas = document.getElementById("piechart");
@@ -303,7 +348,7 @@ function drawPieChart(correct, total) {
     const radius = 60;
 
     if (total === 0) {
-        // Cercle gris si aucune donnée
+        // Grey circle when no data
         ctx.fillStyle = "#cccccc";
         ctx.beginPath();
         ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
@@ -315,14 +360,13 @@ function drawPieChart(correct, total) {
     }
 
     const correctPct = correct / total;
-    const wrongPct = 1 - correctPct;
 
     const successColor = getComputedStyle(document.body).getPropertyValue("--success").trim();
     const errorColor = getComputedStyle(document.body).getPropertyValue("--error").trim();
 
-    // Tranche "bonne réponse"
     const endAngleCorrect = Math.PI * 2 * correctPct;
 
+    // Correct slice
     ctx.beginPath();
     ctx.moveTo(centerX, centerY);
     ctx.fillStyle = successColor;
@@ -333,7 +377,7 @@ function drawPieChart(correct, total) {
     ctx.lineWidth = 1;
     ctx.stroke();
 
-    // Tranche "mauvaise réponse"
+    // Wrong slice
     ctx.beginPath();
     ctx.moveTo(centerX, centerY);
     ctx.fillStyle = errorColor;
@@ -346,10 +390,10 @@ function drawPieChart(correct, total) {
 }
 
 // ----------------------------------------------------
-// FIN DE SESSION
+// END OF SESSION
 // ----------------------------------------------------
 function endSession() {
-    // Masquer la zone quiz, afficher le résumé
+    // Hide quiz, show summary
     document.getElementById("quiz-area").classList.add("hidden");
     document.getElementById("session-summary").classList.remove("hidden");
 
@@ -376,8 +420,7 @@ function endSession() {
     summaryMessage.textContent = msg;
 }
 
-// Redémarrer une nouvelle session
+// Restart: reload page (simple for POC)
 document.getElementById("restart-session").addEventListener("click", () => {
-    // Pour le POC, on recharge simplement la page
     window.location.reload();
 });

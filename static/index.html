@@ -22,7 +22,7 @@
 <!-- LAYOUT GLOBAL -->
 <div id="container">
 
-    <!-- THEMES EXCLUS (à gauche) -->
+    <!-- THEMES EXCLUS (left) -->
     <aside id="excluded-panel">
         <div class="panel-header">
             <h3>Excluded themes</h3>
@@ -30,11 +30,18 @@
         <ul id="excluded-list"></ul>
     </aside>
 
-    <!-- ZONE CENTRALE -->
+    <!-- CENTRAL AREA -->
     <main id="app">
 
-        <!-- CHOIX DU MODE DE SESSION -->
-        <section id="mode-selector">
+        <!-- WELCOME SCREEN -->
+        <section id="welcome-screen">
+            <h1>Welcome to TRICKIA!</h1>
+            <p>Challenge yourself, track your weaknesses, and level up your knowledge.</p>
+            <button id="welcome-start">Are you ready to challenge yourself?</button>
+        </section>
+
+        <!-- SESSION MODE SELECTION -->
+        <section id="mode-selector" class="hidden">
             <h2>Select your session mode</h2>
             <p>Choose how deep you want to go:</p>
             <button class="mode-btn" data-count="20">EXPRESS (20 questions)</button>
@@ -42,7 +49,7 @@
             <button class="mode-btn" data-count="100">FULL-STACK (100 questions)</button>
         </section>
 
-        <!-- SÉLECTEUR DE THÈMES -->
+        <!-- THEME SELECTION -->
         <section id="theme-selector" class="hidden">
             <h2>Select Allowed Themes</h2>
             <p>Uncheck themes you want to exclude from this session.</p>
@@ -50,11 +57,11 @@
             <button id="save-themes">Validate themes &amp; start quiz</button>
         </section>
 
-        <!-- ZONE QUIZ -->
+        <!-- QUIZ AREA -->
         <section id="quiz-area" class="hidden">
 
             <div id="top-area">
-                <!-- Statut de la question -->
+                <!-- Question status -->
                 <div id="status-bar">
                     <p><strong>Question :</strong> <span id="q-number">0 / 0</span></p>
                     <p><strong>Score :</strong> <span id="score">0</span></p>
@@ -62,7 +69,7 @@
                     <p><strong>Difficulty :</strong> <span id="difficulty">-</span></p>
                 </div>
 
-                <!-- Diagramme camembert -->
+                <!-- Pie chart -->
                 <div id="chart-container">
                     <canvas id="piechart" width="140" height="140"></canvas>
                     <div id="chart-tooltip" class="hidden"></div>
@@ -78,7 +85,7 @@
             <button id="btn-new">New question</button>
         </section>
 
-        <!-- FIN DE SESSION -->
+        <!-- SESSION SUMMARY -->
         <section id="session-summary" class="hidden">
             <h2>Session summary</h2>
             <p id="summary-score"></p>
@@ -88,12 +95,22 @@
 
     </main>
 
-    <!-- STATISTIQUES (à droite) -->
+    <!-- STATS (right) -->
     <aside id="sidebar">
         <div class="panel-header">
             <h3>Theme statistics</h3>
         </div>
         <ul id="stats-list"></ul>
+
+        <div class="panel-subheader">
+            <h4>API performance</h4>
+        </div>
+        <ul id="api-stats-list"></ul>
+
+        <div id="source-info">
+            <span class="source-label">Current question source:</span>
+            <span id="current-source">-</span>
+        </div>
     </aside>
 
 </div>

@@ -5,8 +5,8 @@
     --bg: #f2f3f8;
     --card-bg: #ffffff;
     --text: #1e1e1e;
-    --primary: #920914;          /* bordeaux clair */
-    --primary-dark: #5e0008;     /* bordeaux plus sombre */
+    --primary: #920914;          /* light bordeaux */
+    --primary-dark: #5e0008;     /* darker bordeaux */
     --accent: #f6f7fc;
     --border: #dbe1ee;
     --success: #1fa31f;
@@ -17,8 +17,8 @@ body.dark {
     --bg: #1b1e27;
     --card-bg: #2a2e3a;
     --text: #e8e8e8;
-    --primary: #2b4ea3;          /* bleu thème sombre */
-    --primary-dark: #152854;     /* bleu plus sombre */
+    --primary: #2b4ea3;          /* blue theme */
+    --primary-dark: #152854;     /* darker blue */
     --accent: #242836;
     --border: #373b48;
 }
@@ -119,6 +119,19 @@ body {
     font-size: 15px;
 }
 
+.panel-subheader {
+    background: var(--accent);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 6px 10px;
+}
+
+.panel-subheader h4 {
+    margin: 0;
+    font-size: 13px;
+    opacity: 0.8;
+}
+
 #excluded-list,
 #stats-list {
     list-style: none;
@@ -134,17 +147,43 @@ body {
     font-size: 14px;
 }
 
+#api-stats-list {
+    list-style: none;
+    padding: 8px 12px;
+    margin: 0;
+}
+
+#api-stats-list li {
+    font-size: 13px;
+    padding: 4px 0;
+}
+
 .stat-good { color: var(--success); font-weight: bold; }
 .stat-bad  { color: var(--error);  font-weight: bold; }
 
+#source-info {
+    font-size: 12px;
+    padding: 6px 12px 10px;
+    color: #666;
+}
+
+body.dark #source-info {
+    color: #ccc;
+}
+
+.source-label {
+    font-weight: bold;
+}
+
 /* ---------------------------------------------------
-   ZONE CENTRALE
+   CENTRAL ZONE
 --------------------------------------------------- */
 #app {
     width: 720px;
 }
 
 /* Sections */
+#welcome-screen,
 #mode-selector,
 #theme-selector,
 #quiz-area,
@@ -160,7 +199,42 @@ body {
     display: none;
 }
 
-/* TITRES SECTIONS */
+/* Welcome screen */
+#welcome-screen {
+    text-align: center;
+    padding: 40px 30px;
+}
+
+#welcome-screen h1 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 28px;
+}
+
+#welcome-screen p {
+    margin-bottom: 25px;
+    font-size: 16px;
+}
+
+#welcome-start {
+    padding: 14px 20px;
+    font-size: 18px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+}
+
+#welcome-start:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+}
+
+/* Section titles */
 #mode-selector h2,
 #theme-selector h2,
 #session-summary h2 {
@@ -168,7 +242,7 @@ body {
 }
 
 /* ---------------------------------------------------
-   BOUTONS GENERIQUES
+   BUTTONS (generic)
 --------------------------------------------------- */
 button {
     font-family: inherit;
@@ -201,7 +275,7 @@ button {
 }
 
 /* ---------------------------------------------------
-   SELECTION THEMES
+   THEME SELECTION
 --------------------------------------------------- */
 #theme-selector ul {
     list-style: none;
@@ -241,7 +315,7 @@ button {
     margin-bottom: 12px;
 }
 
-/* Buttons answers */
+/* Answer buttons */
 .answer-btn {
     width: 100%;
     margin: 5px 0;
