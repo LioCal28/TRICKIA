@@ -153,8 +153,12 @@ def canonical_theme_from_opentdb_id(cat_id):
     if "vehicles" in n:
         return "Vehicles"
 
-    # Politics / Mythology / Celebrities -> Society & Culture
-    if "politics" in n or "mythology" in n or "celebrities" in n:
+        # Mythology is now its own separate theme
+    if "mythology" in n:
+        return "Mythology"
+
+    # Politics / Celebrities -> Society & Culture
+    if "politics" in n or "celebrities" in n:
         return "Society & Culture"
 
     # Various entertainment buckets grouped as generic Entertainment

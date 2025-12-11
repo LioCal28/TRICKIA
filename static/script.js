@@ -10,6 +10,11 @@ let sessionCorrectAnswers = 0;
 let lastCorrectGlobal = 0;
 let lastTotalGlobal = 0;
 
+let quizStartTime = null;
+let quizTimerInterval = null;
+let quizTotalTimeSeconds = 0;
+
+
 // ----------------------------------------------------
 // THEME MODE (dark / light)
 // ----------------------------------------------------
@@ -131,6 +136,62 @@ function updateExcludedPanel() {
     });
 }
 
+function startQuizTimerIfNeeded() {
+    if (quizTimerInterval !== null) return;  // Already running
+
+    quizStartTime = Date.now();
+    quizTimerInterval = setInterval(() => {
+        const elapsedSec = Math.floor((Date.now() - quizStartTime) / 1000);
+        updateQuizTimerDisplay(elapsedSec);
+    }, 1000);
+}
+
+function updateQuizTimerDisplay(seconds) {
+    const timerEl = document.getElementById("quiz-timer");
+    if (!timerEl) return;
+
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+
+    let text;
+    if (h > 0) {
+        const mm = String(m).padStart(2, "0");
+        const ss = String(s).padStart(2, "0");
+        text = `${h}:${mm}:${ss}`;
+    } else {
+        const mm = String(m).padStart(2, "0");
+        const ss = String(s).padStart(2, "0");
+        text = `${mm}:${ss}`;
+    }
+
+    timerEl.textContent = text;
+}
+
+function stopQuizTimer() {
+    if (quizTimerInterval !== null) {
+        clearInterval(quizTimerInterval);
+        quizTimerInterval = null;
+    }
+    if (quizStartTime !== null) {
+        quizTotalTimeSeconds = Math.floor((Date.now() - quizStartTime) / 1000);
+    }
+}
+
+function formatDurationForSummary(seconds) {
+    if (seconds <= 0) return "0s";
+
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+
+    const parts = [];
+    if (h > 0) parts.push(`${h}h`);
+    if (m > 0 || h > 0) parts.push(`${m}m`);
+    parts.push(`${s}s`);
+    return parts.join(" ");
+}
+
 // ----------------------------------------------------
 // START QUIZ (NEW SESSION)
 // ----------------------------------------------------
@@ -179,9 +240,8 @@ function updateQuestionCounterDisplay() {
 document.getElementById("btn-new").addEventListener("click", loadQuestion);
 
 async function loadQuestion() {
-    // If session finished, don't continue
+        // If session finished, don't load any more questions
     if (sessionCurrentQuestion >= sessionTotalQuestions) {
-        endSession();
         return;
     }
 
@@ -196,7 +256,13 @@ async function loadQuestion() {
         const response = await fetch(url);
         const data = await response.json();
 
-        displayQuestion(data);
+                displayQuestion(data);
+
+        // Start global quiz timer when first question is shown
+        if (!quizStartTime) {
+            startQuizTimerIfNeeded();
+        }
+
         document.getElementById("feedback").textContent = "";
         document.getElementById("feedback").className = "";
         enableAnswers();
@@ -204,6 +270,18 @@ async function loadQuestion() {
     } catch (err) {
         console.error("Erreur chargement question :", err);
     }
+}
+
+function prepareEndOfQuizButton() {
+    const btn = document.getElementById("btn-new");
+    if (!btn) return;
+
+    // Remove the old listener (loadQuestion) and attach endSession
+    btn.removeEventListener("click", loadQuestion);
+    btn.textContent = "See your results!";
+    btn.classList.add("result-button");
+
+    btn.addEventListener("click", endSession);
 }
 
 // ----------------------------------------------------
@@ -274,23 +352,24 @@ async function sendAnswer(id, answer, clickedButton) {
             btn.classList.remove("answer-correct", "answer-wrong", "answer-highlight");
 
             if (btn.textContent === r.correct) {
-                // Correct answer
+                // Correct answer: green + highlight animation
                 btn.classList.add("answer-correct", "answer-highlight");
-            } else if (btn === clickedButton && r.status !== "success") {
-                // Wrong answer clicked by user
-                btn.classList.add("answer-wrong", "answer-highlight");
+            } else {
+                // All other answers become red (no highlight animation)
+                btn.classList.add("answer-wrong");
             }
         });
 
         // Update stats panels + pie chart
         await loadStats();
 
-        // End of session?
+                // End of session?
         if (sessionCurrentQuestion >= sessionTotalQuestions) {
-            endSession();
+            prepareEndOfQuizButton();
         } else {
             updateQuestionCounterDisplay();
         }
+
     } catch (err) {
         console.error("Erreur envoi réponse :", err);
     }
@@ -421,7 +500,10 @@ function drawPieChart(correct, total) {
 // ----------------------------------------------------
 // END OF SESSION
 // ----------------------------------------------------
-function endSession() {
+async function endSession() {
+    // Stop global quiz timer and compute total time
+    stopQuizTimer();
+
     // Hide quiz, show summary
     document.getElementById("quiz-area").classList.add("hidden");
     document.getElementById("session-summary").classList.remove("hidden");
@@ -432,21 +514,108 @@ function endSession() {
 
     const summaryScore = document.getElementById("summary-score");
     const summaryMessage = document.getElementById("summary-message");
+    const topList = document.getElementById("summary-top-themes");
+    const bottomList = document.getElementById("summary-bottom-themes");
+    const badgeContainer = document.getElementById("badge-container");
 
+    // Global recap text
     summaryScore.textContent =
-        `You answered ${sessionCorrectAnswers} out of ` +
-        `${sessionTotalQuestions} questions correctly (${percent}%).`;
+        `Well done! You answered ${sessionCorrectAnswers} out of ` +
+        `${sessionTotalQuestions} questions correctly (${percent}% correct answers) ` +
+        `in ${formatDurationForSummary(quizTotalTimeSeconds)}!`;
 
     let msg;
     if (percent < 50) {
-        msg = "Keep going! Every session helps you improve. Review your weak topics and try again soon.";
+        msg = "Keep going! Every session helps you improve. Focus on your weakest themes and try again soon.";
     } else if (percent <= 80) {
         msg = "Nice job! You're building solid knowledge. A bit more practice and you'll master these topics.";
     } else {
-        msg = "Outstanding performance! 🎉 You're crushing this quiz. Keep up the great work!";
+        msg = "Outstanding performance! 🎉 You really mastered this quiz. Be proud of your achievement!";
     }
-
     summaryMessage.textContent = msg;
+
+    // Clear previous lists & badges
+    topList.innerHTML = "";
+    bottomList.innerHTML = "";
+    badgeContainer.innerHTML = "";
+
+    try {
+        const response = await fetch("/api/stats");
+        const stats = await response.json();
+
+        // Exclude themes with less than 2 questions
+        const filtered = stats.filter(entry => entry.total >= 2);
+
+        if (filtered.length === 0) {
+            topList.innerHTML = "<li>Not enough data to compute per-theme statistics yet.</li>";
+            bottomList.innerHTML = "<li>Not enough data to compute per-theme statistics yet.</li>";
+            const p = document.createElement("p");
+            p.textContent = "Play more questions to unlock achievements!";
+            badgeContainer.appendChild(p);
+            return;
+        }
+
+        const bestSorted = [...filtered].sort((a, b) => b.percent - a.percent);
+        const worstSorted = [...filtered].sort((a, b) => a.percent - b.percent);
+
+        const top3 = bestSorted.slice(0, 3);
+        const bottom3 = worstSorted.slice(0, 3);
+
+        top3.forEach(entry => {
+            const li = document.createElement("li");
+            li.innerHTML =
+                `<strong>${entry.theme}</strong> — ${entry.percent}% (${entry.correct}/${entry.total})<br>` +
+                `<span class="theme-comment">${buildThemeComment(entry.percent, true)}</span>`;
+            topList.appendChild(li);
+        });
+
+        bottom3.forEach(entry => {
+            const li = document.createElement("li");
+            li.innerHTML =
+                `<strong>${entry.theme}</strong> — ${entry.percent}% (${entry.correct}/${entry.total})<br>` +
+                `<span class="theme-comment">${buildThemeComment(entry.percent, false)}</span>`;
+            bottomList.appendChild(li);
+        });
+
+        // Achievements: themes with > 85% and at least 2 questions
+        const achievements = bestSorted.filter(e => e.percent > 85 && e.total >= 2).slice(0, 3);
+        if (achievements.length === 0) {
+            const p = document.createElement("p");
+            p.textContent = "No achievements unlocked yet. Keep playing to earn some!";
+            badgeContainer.appendChild(p);
+        } else {
+            achievements.forEach(entry => {
+                const badge = document.createElement("div");
+                badge.className = "badge-hexagon";
+                badge.textContent = `Expert in ${entry.theme}!`;
+                badgeContainer.appendChild(badge);
+            });
+        }
+    } catch (err) {
+        console.error("Error loading stats for summary:", err);
+        topList.innerHTML = "<li>Could not load detailed statistics.</li>";
+        bottomList.innerHTML = "<li>Could not load detailed statistics.</li>";
+    }
+}
+
+function buildThemeComment(percent, isTop) {
+    if (isTop) {
+        if (percent >= 90) {
+            return "Outstanding mastery of this theme. Keep challenging yourself!";
+        } else if (percent >= 75) {
+            return "You have strong knowledge here. A few more sessions and you'll be unstoppable.";
+        } else {
+            return "You are above average on this theme. Keep going to reach excellence.";
+        }
+    } else {
+        if (percent < 40) {
+            return "This theme is challenging for you. A bit of focused practice will help a lot.";
+        } else if (percent < 60) {
+            return "You're on the right track, but there's still room for improvement.";
+        } else {
+            return "You're doing fairly well here, but you can still push your limits.";
+        }
+    }
 }
 
 // Restart: reload page (simple for POC)

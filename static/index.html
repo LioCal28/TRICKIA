@@ -63,12 +63,17 @@
             <div id="top-area">
                 <!-- Question status + progress -->
                 <div id="status-bar">
-                    <div id="question-progress-block">
-                        <p><strong>Question :</strong> <span id="q-number">0 / 0</span></p>
-                        <div id="progress-container">
-                            <div id="progress-bar"></div>
+                    <div id="timer-container">
+                            <span id="quiz-timer">00:00</span>
                         </div>
-                    </div>
+
+                        <div id="question-progress-block">
+                            <p><strong>Question :</strong> <span id="q-number">0 / 0</span></p>
+                            <div id="progress-container">
+                                <div id="progress-bar"></div>
+                            </div>
+                        </div>
+
                     <p><strong>Score :</strong> <span id="score">0</span></p>
                     <p><strong>Category :</strong> <span id="category">-</span></p>
                     <p><strong>Difficulty :</strong> <span id="difficulty">-</span></p>
@@ -93,8 +98,26 @@
         <!-- SESSION SUMMARY -->
         <section id="session-summary" class="hidden">
             <h2>Session summary</h2>
+
             <p id="summary-score"></p>
             <p id="summary-message"></p>
+
+            <div id="summary-details">
+                <div class="summary-column">
+                    <h3>Your best themes</h3>
+                    <ul id="summary-top-themes"></ul>
+                </div>
+                <div class="summary-column">
+                    <h3>Themes to improve</h3>
+                    <ul id="summary-bottom-themes"></ul>
+                </div>
+            </div>
+
+            <div id="summary-badges">
+                <h3>Your achievements</h3>
+                <div id="badge-container"></div>
+            </div>
+
             <button id="restart-session">Start a new session</button>
         </section>
 
