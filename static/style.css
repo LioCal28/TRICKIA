@@ -562,3 +562,55 @@ body.dark #progress-container {
     );
     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
+
+/* ------------------------------
+   STREAK COUNTER COLORS & EFFECTS
+------------------------------ */
+
+#streak {
+    font-weight: bold;
+    transition: all 0.25s ease-in-out;
+}
+
+/* 1 streak — light blue */
+.streak-1 {
+    color: #4da6ff;
+}
+
+/* 2 streak — orange */
+.streak-2 {
+    color: #ff9933;
+}
+
+/* 3 streak — red + small glow */
+.streak-3 {
+    color: #ff3333;
+    text-shadow: 0 0 4px rgba(255, 50, 50, 0.6);
+}
+
+/* 4 streak — purple + medium glow */
+.streak-4 {
+    color: #b84dff;
+    text-shadow: 0 0 6px rgba(184, 77, 255, 0.75);
+}
+
+/* 5 streak+ — indigo + strong glow + pulse animation */
+.streak-5 {
+    color: #4b3cff;
+    text-shadow: 0 0 10px rgba(75, 60, 255, 0.95);
+    animation: streakPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes streakPulse {
+    0%   { text-shadow: 0 0 8px rgba(75,60,255,0.7); }
+    50%  { text-shadow: 0 0 16px rgba(75,60,255,1); }
+    100% { text-shadow: 0 0 8px rgba(75,60,255,0.7); }
+}
+
+#summary-streak-line {
+    font-size: 17px;
+    font-weight: bold;
+    color: var(--primary-dark);
+    margin-top: 6px;
+    margin-bottom: 12px;
+}

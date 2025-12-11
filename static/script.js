@@ -14,6 +14,9 @@ let quizStartTime = null;
 let quizTimerInterval = null;
 let quizTotalTimeSeconds = 0;
 
+let currentStreak = 0;
+let bestStreak = 0;
+
 
 // ----------------------------------------------------
 // THEME MODE (dark / light)
@@ -333,6 +336,39 @@ async function sendAnswer(id, answer, clickedButton) {
         if (r.status === "success") {
             sessionCorrectAnswers += 1;
         }
+        // --- STREAK SYSTEM ---
+        if (r.status === "success") {
+            currentStreak += 1;
+            if (currentStreak > bestStreak) {
+                bestStreak = currentStreak;
+            }
+        } else {
+            currentStreak = 0;
+        }
+
+        // Update display
+        updateStreakDisplay();
+
+function updateStreakDisplay() {
+    const s = document.getElementById("streak");
+    s.textContent = currentStreak;
+
+    // Remove previous classes
+    s.className = "";
+
+    if (currentStreak >= 5) {
+        s.classList.add("streak-5");
+    } else if (currentStreak === 4) {
+        s.classList.add("streak-4");
+    } else if (currentStreak === 3) {
+        s.classList.add("streak-3");
+    } else if (currentStreak === 2) {
+        s.classList.add("streak-2");
+    } else if (currentStreak === 1) {
+        s.classList.add("streak-1");
+    }
+}
+
 
         // Remove textual bold feedback (now using only highlight)
         const fb = document.getElementById("feedback");
@@ -523,6 +559,12 @@ async function endSession() {
         `Well done! You answered ${sessionCorrectAnswers} out of ` +
         `${sessionTotalQuestions} questions correctly (${percent}% correct answers) ` +
         `in ${formatDurationForSummary(quizTotalTimeSeconds)}!`;
+    
+    // Insert streak info immediately after the global recap line
+        const streakLine = document.createElement("p");
+        streakLine.id = "summary-streak-line";
+        streakLine.textContent = `Your highest streak was ${bestStreak}!`;
+        summaryScore.insertAdjacentElement("afterend", streakLine);
 
     let msg;
     if (percent < 50) {
