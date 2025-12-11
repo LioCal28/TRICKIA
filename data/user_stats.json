@@ -3424,5 +3424,205 @@
         "category": "Television",
         "difficulty": "hard",
         "source": "TheTriviaAPI"
+    },
+    {
+        "question_id": 1,
+        "user_answer": "Amor vincit omnia",
+        "correct_answer": "Amor vincit omnia",
+        "correct": true,
+        "score_after": 1,
+        "category": "Society & Culture",
+        "difficulty": "medium",
+        "source": "TheTriviaAPI"
+    },
+    {
+        "question_id": 2,
+        "user_answer": "M\u0101ui",
+        "correct_answer": "'Oro",
+        "correct": false,
+        "score_after": 1,
+        "category": "Society & Culture",
+        "difficulty": "medium",
+        "source": "OpenTriviaDB"
+    },
+    {
+        "question_id": 3,
+        "user_answer": "Norse",
+        "correct_answer": "Norse",
+        "correct": true,
+        "score_after": 2,
+        "category": "Society & Culture",
+        "difficulty": "hard",
+        "source": "OpenTriviaDB"
+    },
+    {
+        "question_id": 4,
+        "user_answer": "Five",
+        "correct_answer": "Five",
+        "correct": true,
+        "score_after": 3,
+        "category": "Society & Culture",
+        "difficulty": "hard",
+        "source": "TheTriviaAPI"
+    },
+    {
+        "question_id": 5,
+        "user_answer": "Mice",
+        "correct_answer": "Mice",
+        "correct": true,
+        "score_after": 4,
+        "category": "Society & Culture",
+        "difficulty": "easy",
+        "source": "TheTriviaAPI"
+    },
+    {
+        "question_id": 6,
+        "user_answer": "Ariadne",
+        "correct_answer": "Ariadne",
+        "correct": true,
+        "score_after": 5,
+        "category": "Society & Culture",
+        "difficulty": "hard",
+        "source": "OpenTriviaDB"
+    },
+    {
+        "question_id": 7,
+        "user_answer": "A dreidel",
+        "correct_answer": "A dreidel",
+        "correct": true,
+        "score_after": 6,
+        "category": "Society & Culture",
+        "difficulty": "easy",
+        "source": "TheTriviaAPI"
+    },
+    {
+        "question_id": 8,
+        "user_answer": "Victory",
+        "correct_answer": "Victory",
+        "correct": true,
+        "score_after": 7,
+        "category": "Society & Culture",
+        "difficulty": "easy",
+        "source": "OpenTriviaDB"
+    },
+    {
+        "question_id": 9,
+        "user_answer": "Athena turned him into a woman, and then years later back into a man",
+        "correct_answer": "Sailed with the Argonauts to find the golden fleece",
+        "correct": false,
+        "score_after": 7,
+        "category": "Society & Culture",
+        "difficulty": "easy",
+        "source": "OpenTriviaDB"
+    },
+    {
+        "question_id": 10,
+        "user_answer": "Ares",
+        "correct_answer": "Mars",
+        "correct": false,
+        "score_after": 7,
+        "category": "Society & Culture",
+        "difficulty": "easy",
+        "source": "OpenTriviaDB"
+    },
+    {
+        "question_id": 11,
+        "user_answer": "Afroasiatic",
+        "correct_answer": "Afroasiatic",
+        "correct": true,
+        "score_after": 8,
+        "category": "Society & Culture",
+        "difficulty": "medium",
+        "source": "TheTriviaAPI"
+    },
+    {
+        "question_id": 12,
+        "user_answer": "Azan",
+        "correct_answer": "Azan",
+        "correct": true,
+        "score_after": 9,
+        "category": "Society & Culture",
+        "difficulty": "hard",
+        "source": "TheTriviaAPI"
+    },
+    {
+        "question_id": 13,
+        "user_answer": "The Sea",
+        "correct_answer": "The Sea",
+        "correct": true,
+        "score_after": 10,
+        "category": "Society & Culture",
+        "difficulty": "easy",
+        "source": "OpenTriviaDB"
+    },
+    {
+        "question_id": 14,
+        "user_answer": "Obey your thirst",
+        "correct_answer": "Obey your thirst",
+        "correct": true,
+        "score_after": 11,
+        "category": "Society & Culture",
+        "difficulty": "medium",
+        "source": "TheTriviaAPI"
+    },
+    {
+        "question_id": 15,
+        "user_answer": "Los Angeles",
+        "correct_answer": "San Francisco",
+        "correct": false,
+        "score_after": 11,
+        "category": "Society & Culture",
+        "difficulty": "hard",
+        "source": "TheTriviaAPI"
+    },
+    {
+        "question_id": 17,
+        "user_answer": "Hallelujah!",
+        "correct_answer": "Jesus wept.",
+        "correct": false,
+        "score_after": 11,
+        "category": "Society & Culture",
+        "difficulty": "hard",
+        "source": "TheTriviaAPI"
+    },
+    {
+        "question_id": 18,
+        "user_answer": "John Browning",
+        "correct_answer": "Mikhail Kalashnikov",
+        "correct": false,
+        "score_after": 11,
+        "category": "Society & Culture",
+        "difficulty": "medium",
+        "source": "TheTriviaAPI"
+    },
+    {
+        "question_id": 19,
+        "user_answer": "Swahili",
+        "correct_answer": "Swahili",
+        "correct": true,
+        "score_after": 12,
+        "category": "Society & Culture",
+        "difficulty": "medium",
+        "source": "TheTriviaAPI"
+    },
+    {
+        "question_id": 20,
+        "user_answer": "Abercrombie & Fitch",
+        "correct_answer": "McDonald's",
+        "correct": false,
+        "score_after": 12,
+        "category": "Society & Culture",
+        "difficulty": "medium",
+        "source": "TheTriviaAPI"
+    },
+    {
+        "question_id": 21,
+        "user_answer": "Artemis",
+        "correct_answer": "Eris",
+        "correct": false,
+        "score_after": 12,
+        "category": "Society & Culture",
+        "difficulty": "medium",
+        "source": "OpenTriviaDB"
     }
 ]
