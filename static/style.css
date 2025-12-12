@@ -609,8 +609,86 @@ body.dark #progress-container {
 
 #summary-streak-line {
     font-size: 17px;
-    font-weight: bold;
-    color: var(--primary-dark);
+    font-weight: 600; /* semi-bold */
     margin-top: 6px;
     margin-bottom: 12px;
+}
+
+/* ---------------------------------------------------
+   BUTTON LOADING FILL (New question / Results)
+--------------------------------------------------- */
+
+#btn-new {
+    position: relative;
+    overflow: hidden;
+}
+
+#btn-new.loading {
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+#btn-new.loading::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0%;
+    background: rgba(255, 255, 255, 0.35);
+    animation: buttonFill 1.5s linear forwards;
+}
+
+@keyframes buttonFill {
+    from { width: 0%; }
+    to   { width: 100%; }
+}
+
+/* ---------------------------------------------------
+   THEME SELECTION CONSTRAINT (MIN 5)
+--------------------------------------------------- */
+
+#theme-selection-layout {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start; /* prevents stretching to full height */
+}
+
+#theme-info-box {
+    display: inline-block;
+    max-width: 260px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: var(--accent);
+    border: 1px solid var(--border);
+    font-size: 13px;
+}
+
+#theme-info-text {
+    margin-top: 6px;
+}
+
+/* Error state */
+#theme-info-text.error {
+    color: var(--error);
+    font-weight: bold;
+}
+
+#theme-error {
+    margin-top: 8px;
+    color: var(--error);
+    font-weight: bold;
+}
+
+/* Shake animation */
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    50% { transform: translateX(4px); }
+    75% { transform: translateX(-4px); }
+    100% { transform: translateX(0); }
+}
+
+.theme-shake {
+    animation: shake 0.4s;
 }

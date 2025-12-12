@@ -125,6 +125,21 @@ document.getElementById("save-themes").addEventListener("click", () => {
         }
     });
 
+    const infoText = document.getElementById("theme-info-text");
+    const list = document.getElementById("theme-checkboxes");
+
+    if (allowedThemes.length < 5) {
+        infoText.classList.add("error");
+        list.classList.add("theme-shake");
+
+        setTimeout(() => {
+            list.classList.remove("theme-shake");
+        }, 400);
+
+        return;
+    }
+
+    infoText.classList.remove("error");
     updateExcludedPanel();
     startQuiz();
 });
@@ -224,6 +239,12 @@ async function startQuiz() {
 
     updateQuestionCounterDisplay();
     loadStats();      // Theme stats + API stats (reset)
+
+    const btn = document.getElementById("btn-new");
+    btn.textContent = "New question";
+    btn.classList.remove("result-button");
+    btn.dataset.action = "next";
+    btn.classList.remove("loading");
 }
 
 // Update "Question X / N" text and progress bar
@@ -240,7 +261,25 @@ function updateQuestionCounterDisplay() {
 // ----------------------------------------------------
 // LOAD QUESTION
 // ----------------------------------------------------
-document.getElementById("btn-new").addEventListener("click", loadQuestion);
+document.getElementById("btn-new").addEventListener("click", () => {
+    const btn = document.getElementById("btn-new");
+
+    // Prevent double trigger
+    if (btn.classList.contains("loading")) return;
+
+    btn.classList.add("loading");
+
+    setTimeout(() => {
+        btn.classList.remove("loading");
+
+        // If we are at the end, go to results
+        if (btn.dataset.action === "results") {
+    endSession();
+} else {
+    loadQuestion();
+}
+    }, 1500);
+});
 
 async function loadQuestion() {
         // If session finished, don't load any more questions
@@ -279,12 +318,9 @@ function prepareEndOfQuizButton() {
     const btn = document.getElementById("btn-new");
     if (!btn) return;
 
-    // Remove the old listener (loadQuestion) and attach endSession
-    btn.removeEventListener("click", loadQuestion);
     btn.textContent = "See your results!";
     btn.classList.add("result-button");
-
-    btn.addEventListener("click", endSession);
+    btn.dataset.action = "results"; // <-- état explicite
 }
 
 // ----------------------------------------------------
@@ -540,6 +576,12 @@ async function endSession() {
     // Stop global quiz timer and compute total time
     stopQuizTimer();
 
+    // Remove existing streak summary line if any (avoid duplicates)
+const existingStreak = document.getElementById("summary-streak-line");
+if (existingStreak) {
+    existingStreak.remove();
+}
+
     // Hide quiz, show summary
     document.getElementById("quiz-area").classList.add("hidden");
     document.getElementById("session-summary").classList.remove("hidden");
@@ -564,7 +606,22 @@ async function endSession() {
         const streakLine = document.createElement("p");
         streakLine.id = "summary-streak-line";
         streakLine.textContent = `Your highest streak was ${bestStreak}!`;
-        summaryScore.insertAdjacentElement("afterend", streakLine);
+
+        // Apply same streak class as in-game
+        if (bestStreak >= 5) {
+            streakLine.classList.add("streak-5");
+        } else if (bestStreak === 4) {
+            streakLine.classList.add("streak-4");
+        } else if (bestStreak === 3) {
+            streakLine.classList.add("streak-3");
+        } else if (bestStreak === 2) {
+            streakLine.classList.add("streak-2");
+        } else if (bestStreak === 1) {
+            streakLine.classList.add("streak-1");
+        }
+
+summaryScore.insertAdjacentElement("afterend", streakLine);
+
 
     let msg;
     if (percent < 50) {

@@ -53,7 +53,19 @@
         <section id="theme-selector" class="hidden">
             <h2>Select Allowed Themes</h2>
             <p>Uncheck themes you want to exclude from this session.</p>
-            <ul id="theme-checkboxes"></ul>
+
+            <div id="theme-selection-layout">
+                <ul id="theme-checkboxes"></ul>
+
+                <!-- INFO BOX -->
+                <div id="theme-info-box">
+                    <p><strong>Minimum selection required</strong></p>
+                    <p id="theme-info-text">
+                        Please select at least 5 themes from the list!
+                    </p>
+                </div>
+            </div>
+
             <button id="save-themes">Validate themes &amp; start quiz</button>
         </section>
 

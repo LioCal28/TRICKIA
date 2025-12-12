@@ -173,37 +173,35 @@ def canonical_theme_from_opentdb_id(cat_id):
 
 
 def trivia_slug_for_theme(canonical_theme: str | None):
-    """Map canonical theme to The Trivia API category slug."""
+    """Return a TriviaAPI slug ONLY if the theme is really supported."""
     if not canonical_theme:
         return None
+
     t = canonical_theme.lower()
 
     if "general knowledge" in t:
         return "general_knowledge"
-    if "science" in t:
+    if t == "science":
         return "science"
-    if "mathematics" in t:
-        # The Trivia API may not have dedicated math, use science
-        return "science"
-    if "geography" in t:
+    if t == "geography":
         return "geography"
-    if "history" in t:
+    if t == "history":
         return "history"
-    if "food" in t:
-        return "food_and_drink"
-    if "society" in t or "culture" in t:
-        return "society_and_culture"
-    if "music" in t:
+    if t == "music":
         return "music"
     if "sport" in t:
         return "sport_and_leisure"
-    if "video games" in t or "television" in t or "entertainment" in t:
-        # Approximation: use film & TV when targeting entertainment/gaming
+    if "society" in t or "culture" in t:
+        return "society_and_culture"
+    if "television" in t:
         return "film_and_tv"
+    if "food" in t:
+        return "food_and_drink"
+    if "arts" in t or "literature" in t:
+        return "arts_and_literature"
 
-    return None  # fallback: no category filter
-
-
+    # ❌ Mythology, Mathematics, Video Games, etc.
+    return None
 # -----------------------------------------------------
 # OPEN TRIVIA DB FETCH
 # -----------------------------------------------------
@@ -281,29 +279,32 @@ def fetch_triviaapi_question(canonical_theme: str | None = None):
 
     difficulty = q.get("difficulty", "unknown")
     return {
-        "question": question,
-        "correct": correct,
-        "answers": answers,
-        "difficulty": difficulty
-    }
-
+    "question": question,
+    "correct": correct,
+    "answers": answers,
+    "difficulty": difficulty,
+    "raw_category": q.get("category")
+}
 
 # -----------------------------------------------------
 # SOURCE SELECTION & RETRIES
 # -----------------------------------------------------
-def choose_source():
-    """Choose a trivia source based on weights and disabled flags."""
-    enabled_sources = [s for s, disabled in API_DISABLED.items() if not disabled]
-    if not enabled_sources:
+def choose_source_for_theme(category_id, canonical_theme):
+    slug = trivia_slug_for_theme(canonical_theme)
+
+    enabled = [s for s, disabled in API_DISABLED.items() if not disabled]
+    if not enabled:
         raise Exception("No trivia source available")
 
-    if len(enabled_sources) == 1:
-        return enabled_sources[0]
+    # If a category is explicitly requested but TriviaAPI can't filter it properly,
+    # force OpenTriviaDB for better category accuracy
+    if category_id is not None and slug is None:
+        return "OpenTriviaDB" if "OpenTriviaDB" in enabled else enabled[0]
 
-    # Both enabled: 70% The Trivia API, 30% OpenTriviaDB
-    r = random.random()
-    return "TheTriviaAPI" if r < PRIMARY_SOURCE_RATIO else "OpenTriviaDB"
+    if len(enabled) == 1:
+        return enabled[0]
 
+    return "TheTriviaAPI" if random.random() < PRIMARY_SOURCE_RATIO else "OpenTriviaDB"
 
 def fetch_from_source(source, category_id, canonical_theme):
     """Try up to 3 times for the chosen source."""
@@ -325,7 +326,7 @@ def fetch_question_any_source(category_id, canonical_theme):
     tried = set()
 
     for _ in range(2):  # at most two different sources
-        source = choose_source()
+        source = choose_source_for_theme(category_id, canonical_theme)
         if source in tried:
             # avoid infinite loop
             break
@@ -381,7 +382,7 @@ def get_question():
     category_param = request.args.get("category")
     category_id = int(category_param) if category_param else None
 
-    canonical_theme = canonical_theme_from_opentdb_id(category_id)
+    requested_theme = canonical_theme_from_opentdb_id(category_id)
 
     QUESTION_NUMBER += 1
 
@@ -390,7 +391,7 @@ def get_question():
 
     # Avoid duplicates for the current quiz session
     for _ in range(5):
-        q_data, src = fetch_question_any_source(category_id, canonical_theme)
+        q_data, src = fetch_question_any_source(category_id, requested_theme)
         key = (src, q_data["question"])
         if key not in USED_QUESTIONS:
             USED_QUESTIONS.add(key)
@@ -400,10 +401,29 @@ def get_question():
 
     # If we couldn't avoid duplicates, just use the last fetched question
     if q is None or source is None:
-        q, source = fetch_question_any_source(category_id, canonical_theme)
+        q, source = fetch_question_any_source(category_id, requested_theme)
+
+    # Determine final displayed theme AFTER receiving the question
+    if source == "OpenTriviaDB":
+        final_theme = requested_theme
+    else:
+        raw_cat = q_data.get("raw_category", "").lower()
+
+        if "history" in raw_cat or "politics" in raw_cat:
+            final_theme = "History"
+        elif "music" in raw_cat:
+            final_theme = "Music"
+        elif "film" in raw_cat or "tv" in raw_cat:
+            final_theme = "Television"
+        elif "science" in raw_cat:
+            final_theme = "Science"
+        elif "myth" in raw_cat:
+            final_theme = "Mythology"
+        else:
+            final_theme = "General Knowledge"
 
     LAST_CORRECT_ANSWER = q["correct"]
-    LAST_CATEGORY = canonical_theme
+    LAST_CATEGORY = final_theme
     LAST_DIFFICULTY = q["difficulty"]
     LAST_SOURCE = source
 
@@ -411,7 +431,7 @@ def get_question():
         "id": QUESTION_NUMBER,
         "question": q["question"],
         "answers": q["answers"],
-        "category": canonical_theme,
+        "category": final_theme,
         "difficulty": q["difficulty"],
         "source": source
     })
