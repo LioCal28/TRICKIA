@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Your Trickia Profile</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- HEADER (identique au quiz) -->
+  <header id="main-header">
+    <div id="logo-area">
+      <span id="logo">TRICKIA</span>
+      <span id="subtitle">Your own evolving quiz!</span>
+    </div>
+
+    <div id="header-actions">
+      <button id="profile-btn">Your Trickia profile</button>
+      <button id="logout-btn">Logout</button>
+      <button id="theme-toggle">☾ Dark mode</button>
+    </div>
+  </header>
+
+  <!-- MAIN PROFILE CONTENT -->
+  <main class="profile-container">
+
+    <!-- 🔽 ICI : PROFILE HERO -->
+    <div class="profile-hero">
+      <h1 id="profile-username"></h1>
+      <p id="profile-total-questions"></p>
+    </div>
+
+    <!-- 🔽 ICI : THEME STATS -->
+    <div class="profile-stats">
+      <h2>Theme performance</h2>
+      <ul id="profile-theme-list"></ul>
+    </div>
+
+    <!-- 🔽 ICI : EXTRA STATS -->
+    <div class="profile-extra">
+      <p id="profile-best-streak"></p>
+    </div>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

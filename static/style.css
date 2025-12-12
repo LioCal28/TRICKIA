@@ -692,3 +692,250 @@ body.dark #progress-container {
 .theme-shake {
     animation: shake 0.4s;
 }
+
+/* =====================================================
+   AUTH PAGES (LOGIN / REGISTER)
+===================================================== */
+
+.auth-page {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Header */
+.auth-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 40px;
+}
+
+.auth-header {
+  background: linear-gradient(
+    135deg,
+    var(--primary-dark),
+    var(--primary),
+    var(--primary-dark)
+  );
+  color: white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.auth-header #theme-toggle {
+  background: rgba(255,255,255,0.9);
+}
+
+.logo {
+  font-size: 2.2rem;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
+/* Container */
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--card-bg);
+  padding: 36px;
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  text-align: center;
+}
+
+/* Text */
+.auth-card h2 {
+  margin-bottom: 8px;
+}
+
+.auth-subtitle {
+  font-size: 0.95rem;
+  opacity: 0.85;
+  margin-bottom: 24px;
+}
+
+/* Form */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.auth-form input {
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: var(--accent);
+  border-color: var(--primary);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.auth-form input:focus {
+  outline: 2px solid var(--accent);
+}
+
+/* Button */
+.primary-btn {
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  background: var(--primary);
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.primary-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+
+/* Footer */
+.auth-footer {
+  margin-top: 20px;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.auth-footer a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
+}
+
+/* =====================================================
+   HEADER ACTION BUTTONS (PROFILE / LOGOUT)
+===================================================== */
+
+#header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Profile button (premium) */
+#profile-btn {
+    padding: 8px 16px;
+    border-radius: 12px;
+    background: linear-gradient(
+        135deg,
+        rgba(255,255,255,0.95),
+        rgba(245,245,245,0.9)
+    );
+    color: var(--primary-dark);
+    font-weight: 600;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+#profile-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.35);
+}
+
+/* Logout button */
+#logout-btn {
+    padding: 8px 14px;
+    border-radius: 12px;
+    background: transparent;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.6);
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+}
+
+#logout-btn:hover {
+    background: rgba(255,255,255,0.15);
+    transform: translateY(-1px);
+}
+
+/* =====================================================
+   PROFILE PAGE
+===================================================== */
+
+.profile-container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.profile-hero {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.profile-hero h1 {
+  font-size: 2.6rem;
+  margin-bottom: 10px;
+}
+
+.profile-hero p {
+  font-size: 1.1rem;
+  opacity: 0.8;
+}
+
+.profile-stats {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.profile-stats h2 {
+  margin-bottom: 20px;
+}
+
+.theme-row {
+  display: grid;
+  grid-template-columns: 1fr 80px 1fr;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.theme-name {
+  font-weight: 600;
+}
+
+.theme-percent {
+  text-align: right;
+  font-weight: 600;
+}
+
+.theme-bar {
+  height: 10px;
+  border-radius: 6px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.theme-bar-fill {
+  height: 100%;
+  background: var(--primary);
+  width: 0%;
+  transition: width 0.6s ease;
+}

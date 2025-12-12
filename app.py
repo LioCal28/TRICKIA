@@ -1,538 +1,475 @@
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, jsonify, request, send_from_directory, redirect, session
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_sqlalchemy import SQLAlchemy
+from functools import wraps
+from datetime import datetime
 import requests
-import random
 import html
-import json
-import os
+import random
+import hashlib
 
+# =====================================================
+# APP & DB CONFIG
+# =====================================================
 app = Flask(__name__, static_folder="static", static_url_path="")
+app.secret_key = "change_this_secret_key"
 
-# -----------------------------------------------------
-# GLOBAL STATE
-# -----------------------------------------------------
-THEME_STATS = {}       # { "Science": {"correct": X, "total": Y}, ... }
-QUESTION_NUMBER = 0
-USER_SCORE = 0
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///trickia.db"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+db = SQLAlchemy(app)
 
-LAST_CORRECT_ANSWER = None
-LAST_CATEGORY = None     # Canonical theme (e.g. "Science", "Video Games")
-LAST_DIFFICULTY = None
-LAST_SOURCE = None       # "OpenTriviaDB" or "TheTriviaAPI"
+# =====================================================
+# MODELS
+# =====================================================
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password_hash = db.Column(db.String(200), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-USED_QUESTIONS = set()   # Set of (source, question_text) for current session
+class UserThemeStats(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    theme = db.Column(db.String(50), nullable=False)
 
-API_DISABLED = {
-    "OpenTriviaDB": False,
-    "TheTriviaAPI": False,
-}
+    total_questions = db.Column(db.Integer, default=0)
+    correct_answers = db.Column(db.Integer, default=0)
+    best_streak = db.Column(db.Integer, default=0)
+    last_played = db.Column(db.DateTime, default=datetime.utcnow)
 
-API_STATS = {
-    "OpenTriviaDB": {"correct": 0, "total": 0},
-    "TheTriviaAPI": {"correct": 0, "total": 0},
-}
+    __table_args__ = (
+        db.UniqueConstraint("user_id", "theme", name="user_theme_unique"),
+    )
 
-PRIMARY_SOURCE_RATIO = 0.7  # 70% The Trivia API, 30% OpenTriviaDB
+class UserSeenQuestion(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
+    question_hash = db.Column(db.String(64), nullable=False)
+    source = db.Column(db.String(30))
+    theme = db.Column(db.String(50))
 
-# OpenTrivia category IDs (static mapping)
-OPENTDB_ID_TO_NAME = {
-    9: "General Knowledge",
-    10: "Entertainment: Books",
-    11: "Entertainment: Film",
-    12: "Entertainment: Music",
-    13: "Entertainment: Musicals & Theatres",
-    14: "Entertainment: Television",
-    15: "Entertainment: Video Games",
-    16: "Entertainment: Board Games",
-    17: "Science & Nature",
-    18: "Science: Computers",
-    19: "Science: Mathematics",
-    20: "Mythology",
-    21: "Sports",
-    22: "Geography",
-    23: "History",
-    24: "Politics",
-    25: "Art",
-    26: "Celebrities",
-    27: "Animals",
-    28: "Vehicles",
-    29: "Entertainment: Comics",
-    30: "Science: Gadgets",
-    31: "Entertainment: Japanese Anime & Manga",
-    32: "Entertainment: Cartoon & Animations",
-}
+    first_seen = db.Column(db.DateTime, default=datetime.utcnow)
+    last_seen = db.Column(db.DateTime, default=datetime.utcnow)
 
+    __table_args__ = (
+        db.UniqueConstraint("user_id", "question_hash", name="uq_user_question"),
+    )
 
-# -----------------------------------------------------
-# FRONTEND
-# -----------------------------------------------------
+# =====================================================
+# AUTH HELPERS
+# =====================================================
+def get_current_user():
+    uid = session.get("user_id")
+    if not uid:
+        return None
+    return User.query.get(uid)
+
+def login_required(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        if not get_current_user():
+            return jsonify({"error": "Authentication required"}), 401
+        return f(*args, **kwargs)
+    return wrapper
+
+# =====================================================
+# HELPERS
+# =====================================================
+def compute_question_hash(question_text: str) -> str:
+    # Normalize to reduce duplicates caused by case/whitespace differences
+    normalized = " ".join((question_text or "").lower().strip().split())
+    return hashlib.sha256(normalized.encode("utf-8")).hexdigest()
+
+# =====================================================
+# FRONT ROUTES
+# =====================================================
 @app.route("/")
 def index():
+    return redirect("/app") if get_current_user() else redirect("/login")
+
+@app.route("/app")
+def app_page():
+    if not get_current_user():
+        return redirect("/login")
     return send_from_directory("static", "index.html")
 
+@app.route("/profile")
+def profile():
+    if not get_current_user():
+        return redirect("/login")
+    return send_from_directory("static", "profile.html")
 
-# -----------------------------------------------------
-# UTIL : SAVE USER STATS TO JSON
-# -----------------------------------------------------
-def save_user_stat(entry):
-    file_path = "data/user_stats.json"
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        u = request.form.get("username")
+        p = request.form.get("password")
+        user = User.query.filter_by(username=u).first()
+        if not user or not check_password_hash(user.password_hash, p):
+            return "Invalid credentials", 401
+        session["user_id"] = user.id
+        return redirect("/app")
+    return send_from_directory("static", "login.html")
 
-    if not os.path.exists("data"):
-        os.makedirs("data")
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        u = request.form.get("username")
+        p = request.form.get("password")
+        if User.query.filter_by(username=u).first():
+            return "Username already exists", 400
+        user = User(username=u, password_hash=generate_password_hash(p))
+        db.session.add(user)
+        db.session.commit()
+        session["user_id"] = user.id
+        return redirect("/app")
+    return send_from_directory("static", "register.html")
 
-    if not os.path.exists(file_path) or os.path.getsize(file_path) == 0:
-        data = []
-    else:
-        try:
-            with open(file_path, "r") as f:
-                data = json.load(f)
-                if not isinstance(data, list):
-                    data = []
-        except Exception:
-            data = []
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/login")
 
-    data.append(entry)
-
-    with open(file_path, "w") as f:
-        json.dump(data, f, indent=4)
-
-
-# -----------------------------------------------------
+# =====================================================
 # CATEGORY NORMALIZATION
-# -----------------------------------------------------
-def canonical_theme_from_opentdb_id(cat_id):
-    """Map OpenTriviaDB category ID to a canonical theme name (clean, no 'Entertainment:' prefix)."""
-    if cat_id is None:
-        return "General Knowledge"
-
-    name = OPENTDB_ID_TO_NAME.get(cat_id, "General Knowledge")
-    n = name.lower()
-
-    # Science group (excluding Mathematics)
-    if "science" in n and "mathematics" not in n:
-        return "Science"
-
-    # Mathematics kept separate
-    if "mathematics" in n:
-        return "Mathematics"
-
-    # Animals considered part of Science
-    if name == "Animals":
-        return "Science"
-
-    # Simple mappings
-    if name == "General Knowledge":
-        return "General Knowledge"
-
-    if name == "Sports":
-        return "Sports"
-
-    if "geography" in n:
-        return "Geography"
-
-    if "history" in n:
-        return "History"
-
-    # Music (remove 'Entertainment:' prefix)
-    if "music" in n:
-        return "Music"
-
-    # Films / TV -> Television bucket
-    if "television" in n or "film" in n or "movie" in n:
-        return "Television"
-
-    # Video games
-    if "video games" in n:
-        return "Video Games"
-
-    # Art -> Society & Culture
-    if name == "Art":
-        return "Society & Culture"
-
-    # Vehicles kept separate
-    if "vehicles" in n:
-        return "Vehicles"
-
-        # Mythology is now its own separate theme
-    if "mythology" in n:
-        return "Mythology"
-
-    # Politics / Celebrities -> Society & Culture
-    if "politics" in n or "celebrities" in n:
-        return "Society & Culture"
-
-    # Various entertainment buckets grouped as generic Entertainment
-    if any(k in n for k in ["comics", "anime", "cartoon", "musicals", "theatres", "books", "board games", "japanese"]):
-        return "Entertainment"
-
-    # Default: remove 'Entertainment:' prefix if still present
-    if name.startswith("Entertainment:"):
-        return name.split(":", 1)[1].strip()
-
-    return name
-
-
-def trivia_slug_for_theme(canonical_theme: str | None):
-    """Return a TriviaAPI slug ONLY if the theme is really supported."""
-    if not canonical_theme:
-        return None
-
-    t = canonical_theme.lower()
-
-    if "general knowledge" in t:
-        return "general_knowledge"
-    if t == "science":
-        return "science"
-    if t == "geography":
-        return "geography"
-    if t == "history":
-        return "history"
-    if t == "music":
-        return "music"
-    if "sport" in t:
-        return "sport_and_leisure"
-    if "society" in t or "culture" in t:
-        return "society_and_culture"
-    if "television" in t:
-        return "film_and_tv"
-    if "food" in t:
-        return "food_and_drink"
-    if "arts" in t or "literature" in t:
-        return "arts_and_literature"
-
-    # ❌ Mythology, Mathematics, Video Games, etc.
-    return None
-# -----------------------------------------------------
-# OPEN TRIVIA DB FETCH
-# -----------------------------------------------------
-def fetch_trivia_question(category_id=None):
-    base = "https://opentdb.com/api.php?amount=1&type=multiple"
-
-    if category_id is not None:
-        base += f"&category={category_id}"
-
-    headers = {"User-Agent": "Mozilla/5.0"}
-    resp = requests.get(base, headers=headers, timeout=5)
-
-    if resp.status_code != 200:
-        raise Exception("Erreur API OpenTriviaDB")
-
-    data = resp.json()
-    if data.get("response_code") != 0:
-        raise Exception("Aucune question valide renvoyée (OpenTriviaDB)")
-
-    q = data["results"][0]
-
-    question = html.unescape(q.get("question", "Question indisponible"))
-    correct = html.unescape(q.get("correct_answer", ""))
-    incorrect = [html.unescape(a) for a in q.get("incorrect_answers", [])]
-
-    answers = incorrect + [correct]
-    random.shuffle(answers)
-
-    difficulty = html.unescape(q.get("difficulty", "unknown"))
-
-    return {
-        "question": question,
-        "correct": correct,
-        "answers": answers,
-        "difficulty": difficulty
-    }
-
-
-# -----------------------------------------------------
-# THE TRIVIA API FETCH
-# -----------------------------------------------------
-def fetch_triviaapi_question(canonical_theme: str | None = None):
-    base = "https://the-trivia-api.com/v2/questions?limit=1"
-    headers = {"User-Agent": "Mozilla/5.0"}
-
-    slug = trivia_slug_for_theme(canonical_theme)
-    if slug:
-        url = f"{base}&categories={slug}"
-    else:
-        url = base
-
-    resp = requests.get(url, headers=headers, timeout=5)
-    if resp.status_code != 200:
-        raise Exception("Erreur API The Trivia API")
-
-    data = resp.json()
-    if not isinstance(data, list) or not data:
-        raise Exception("Aucune question valide renvoyée (The Trivia API)")
-
-    q = data[0]
-
-    question_raw = q.get("question", {})
-    if isinstance(question_raw, dict):
-        question = question_raw.get("text", "Question unavailable")
-    else:
-        question = str(question_raw or "Question unavailable")
-
-    correct = q.get("correctAnswer", "")
-    incorrect = q.get("incorrectAnswers", [])
-    if not isinstance(incorrect, list):
-        incorrect = []
-
-    answers = incorrect + [correct]
-    random.shuffle(answers)
-
-    difficulty = q.get("difficulty", "unknown")
-    return {
-    "question": question,
-    "correct": correct,
-    "answers": answers,
-    "difficulty": difficulty,
-    "raw_category": q.get("category")
+# =====================================================
+OPENTDB_ID_TO_NAME = {
+    9: "General Knowledge", 10: "Books", 11: "Film", 12: "Music",
+    14: "Television", 15: "Video Games", 17: "Science",
+    18: "Computers", 19: "Mathematics", 20: "Mythology",
+    21: "Sports", 22: "Geography", 23: "History", 24: "Politics"
 }
 
-# -----------------------------------------------------
-# SOURCE SELECTION & RETRIES
-# -----------------------------------------------------
-def choose_source_for_theme(category_id, canonical_theme):
-    slug = trivia_slug_for_theme(canonical_theme)
+def canonical_theme_from_opentdb_id(cid):
+    name = OPENTDB_ID_TO_NAME.get(cid, "").lower()
+    if "math" in name: return "Mathematics"
+    if "science" in name: return "Science"
+    if "history" in name or "politics" in name: return "History"
+    if "music" in name: return "Music"
+    if "film" in name or "television" in name: return "Television"
+    if "mythology" in name: return "Mythology"
+    if "sports" in name: return "Sports"
+    if "geography" in name: return "Geography"
+    return "General Knowledge"
 
-    enabled = [s for s, disabled in API_DISABLED.items() if not disabled]
-    if not enabled:
-        raise Exception("No trivia source available")
+# =====================================================
+# TRIVIA FETCH
+# =====================================================
+def fetch_opentdb(category_id):
+    url = "https://opentdb.com/api.php?amount=1&type=multiple"
+    if category_id:
+        url += f"&category={category_id}"
+    q = requests.get(url, timeout=5).json()["results"][0]
+    question = html.unescape(q["question"])
+    correct = html.unescape(q["correct_answer"])
+    answers = [html.unescape(a) for a in q["incorrect_answers"]] + [correct]
+    random.shuffle(answers)
+    return question, correct, answers, q["difficulty"]
 
-    # If a category is explicitly requested but TriviaAPI can't filter it properly,
-    # force OpenTriviaDB for better category accuracy
-    if category_id is not None and slug is None:
-        return "OpenTriviaDB" if "OpenTriviaDB" in enabled else enabled[0]
+def fetch_triviaapi():
+    q = requests.get(
+        "https://the-trivia-api.com/v2/questions?limit=1",
+        timeout=5
+    ).json()[0]
+    question = q["question"]["text"]
+    correct = q["correctAnswer"]
+    answers = q["incorrectAnswers"] + [correct]
+    random.shuffle(answers)
+    return question, correct, answers, q.get("difficulty", "unknown"), q.get("category", "")
 
-    if len(enabled) == 1:
-        return enabled[0]
-
-    return "TheTriviaAPI" if random.random() < PRIMARY_SOURCE_RATIO else "OpenTriviaDB"
-
-def fetch_from_source(source, category_id, canonical_theme):
-    """Try up to 3 times for the chosen source."""
-    last_error = None
-    for _ in range(3):
-        try:
-            if source == "OpenTriviaDB":
-                return fetch_trivia_question(category_id)
-            else:
-                return fetch_triviaapi_question(canonical_theme)
-        except Exception as e:
-            last_error = e
-    raise last_error or Exception(f"Failed to fetch from {source}")
-
-
-def fetch_question_any_source(category_id, canonical_theme):
-    """Choose a source (70/30), try it; fallback to other if completely failing."""
-    last_error = None
-    tried = set()
-
-    for _ in range(2):  # at most two different sources
-        source = choose_source_for_theme(category_id, canonical_theme)
-        if source in tried:
-            # avoid infinite loop
-            break
-        tried.add(source)
-
-        try:
-            q = fetch_from_source(source, category_id, canonical_theme)
-            return q, source
-        except Exception as e:
-            # Disable this source for the rest of the session
-            API_DISABLED[source] = True
-            last_error = e
-
-    raise last_error or Exception("No trivia API could provide a question")
-
-
-# -----------------------------------------------------
-# ROUTE : START NEW SESSION
-# -----------------------------------------------------
+# =====================================================
+# SESSION START
+# =====================================================
+@login_required
 @app.route("/api/session/start", methods=["POST"])
 def start_session():
-    """
-    Called from frontend at the beginning of a new quiz session.
-    Resets session-level and stats state.
-    """
-    global QUESTION_NUMBER, USER_SCORE, USED_QUESTIONS, API_DISABLED, THEME_STATS, API_STATS
-
-    QUESTION_NUMBER = 0
-    USER_SCORE = 0
-    USED_QUESTIONS = set()
-    API_DISABLED = {
-        "OpenTriviaDB": False,
-        "TheTriviaAPI": False,
+    session["quiz_state"] = {
+        "question_number": 0,
+        "score": 0,
+        "used_questions": [],   # session-level memory (fast)
+        "theme_stats": {},
+        "best_streak": 0,
+        "current_streak": 0,
+        "start_time": datetime.utcnow(),
+        "last": {}
     }
-
-    # Reset theme and API performance stats for this new quiz
-    THEME_STATS = {}
-    API_STATS = {
-        "OpenTriviaDB": {"correct": 0, "total": 0},
-        "TheTriviaAPI": {"correct": 0, "total": 0},
-    }
-
     return jsonify({"status": "ok"})
 
+# =====================================================
+# QUESTION (STEP 4: PERSISTENT ANTI-DUPLICATES)
+# =====================================================
 
-# -----------------------------------------------------
-# ROUTE : GET NEW QUESTION
-# -----------------------------------------------------
+@login_required
 @app.route("/api/question")
-def get_question():
-    global LAST_CORRECT_ANSWER, LAST_CATEGORY, LAST_DIFFICULTY, LAST_SOURCE, QUESTION_NUMBER, USED_QUESTIONS
+def question():
+    user = get_current_user()
 
-    category_param = request.args.get("category")
-    category_id = int(category_param) if category_param else None
+    state = session.get("quiz_state")
+    if not state:
+        return jsonify({"error": "Quiz not started"}), 400
 
-    requested_theme = canonical_theme_from_opentdb_id(category_id)
+    cid = request.args.get("category", type=int)
+    requested_theme = canonical_theme_from_opentdb_id(cid)
 
-    QUESTION_NUMBER += 1
+    # Source selection logic (3C)
+    forced_source = "OpenTriviaDB" if (cid is not None) else None
+    # If you want to keep your special forcing, use:
+    # forced_source = "OpenTriviaDB" if (cid in [19, 20] or cid) else None
 
-    q = None
-    source = None
+    chosen = None
 
-    # Avoid duplicates for the current quiz session
-    for _ in range(5):
-        q_data, src = fetch_question_any_source(category_id, requested_theme)
-        key = (src, q_data["question"])
-        if key not in USED_QUESTIONS:
-            USED_QUESTIONS.add(key)
-            q = q_data
-            source = src
-            break
+    # Retry up to N times to avoid duplicates (persisted + session)
+    for _attempt in range(5):
+        source = forced_source or random.choice(["OpenTriviaDB", "TheTriviaAPI"])
+        theme = requested_theme
 
-    # If we couldn't avoid duplicates, just use the last fetched question
-    if q is None or source is None:
-        q, source = fetch_question_any_source(category_id, requested_theme)
-
-    # Determine final displayed theme AFTER receiving the question
-    if source == "OpenTriviaDB":
-        final_theme = requested_theme
-    else:
-        raw_cat = q_data.get("raw_category", "").lower()
-
-        if "history" in raw_cat or "politics" in raw_cat:
-            final_theme = "History"
-        elif "music" in raw_cat:
-            final_theme = "Music"
-        elif "film" in raw_cat or "tv" in raw_cat:
-            final_theme = "Television"
-        elif "science" in raw_cat:
-            final_theme = "Science"
-        elif "myth" in raw_cat:
-            final_theme = "Mythology"
+        if source == "OpenTriviaDB":
+            q_text, c, a, d = fetch_opentdb(cid)
         else:
-            final_theme = "General Knowledge"
+            q_text, c, a, d, raw = fetch_triviaapi()
+            raw = (raw or "").lower()
+            if "music" in raw:
+                theme = "Music"
+            elif "history" in raw or "politics" in raw:
+                theme = "History"
+            elif "film" in raw or "tv" in raw:
+                theme = "Television"
+            elif "science" in raw:
+                theme = "Science"
 
-    LAST_CORRECT_ANSWER = q["correct"]
-    LAST_CATEGORY = final_theme
-    LAST_DIFFICULTY = q["difficulty"]
-    LAST_SOURCE = source
+        # Session-level dedupe
+        session_key = (source, q_text)
+        if session_key in state.get("used_questions", []):
+            continue
+
+        # Persistent dedupe (per user)
+        h = compute_question_hash(q_text)
+        seen = UserSeenQuestion.query.filter_by(user_id=user.id, question_hash=h).first()
+        if seen:
+            continue
+
+        chosen = (q_text, c, a, d, theme, source, h, session_key)
+        break
+
+    # Fallback: accept something even if duplicate
+    if chosen is None:
+        source = forced_source or random.choice(["OpenTriviaDB", "TheTriviaAPI"])
+        theme = requested_theme
+
+        if source == "OpenTriviaDB":
+            q_text, c, a, d = fetch_opentdb(cid)
+        else:
+            q_text, c, a, d, raw = fetch_triviaapi()
+            raw = (raw or "").lower()
+            if "music" in raw:
+                theme = "Music"
+            elif "history" in raw or "politics" in raw:
+                theme = "History"
+            elif "film" in raw or "tv" in raw:
+                theme = "Television"
+            elif "science" in raw:
+                theme = "Science"
+
+        h = compute_question_hash(q_text)
+        seen = UserSeenQuestion.query.filter_by(user_id=user.id, question_hash=h).first()
+
+        if seen:
+            seen.last_seen = datetime.utcnow()
+        else:
+            db.session.add(UserSeenQuestion(
+                user_id=user.id,
+                question_hash=h,
+                source=source,
+                theme=theme
+            ))
+        db.session.commit()
+
+        session_key = (source, q_text)
+        state.setdefault("used_questions", [])
+        if session_key not in state["used_questions"]:
+            state["used_questions"].append(session_key)
+
+        state["question_number"] = state.get("question_number", 0) + 1
+
+        # ✅ ALWAYS set last with a predictable schema
+        state["last"] = {"correct": c, "theme": theme, "question": q_text, "source": source}
+
+        # Ensure session writes nested dict changes
+        session["quiz_state"] = state
+        session.modified = True
+
+        return jsonify({
+            "id": state["question_number"],
+            "question": q_text,
+            "answers": a,
+            "difficulty": d,
+            "category": theme,
+            "source": source
+        })
+
+    # Normal accepted question
+    q_text, c, a, d, theme, source, h, session_key = chosen
+
+    db.session.add(UserSeenQuestion(
+        user_id=user.id,
+        question_hash=h,
+        source=source,
+        theme=theme
+    ))
+    db.session.commit()
+
+    state.setdefault("used_questions", [])
+    state["used_questions"].append(session_key)
+    state["question_number"] = state.get("question_number", 0) + 1
+
+    # ✅ ALWAYS set last with a predictable schema
+    state["last"] = {"correct": c, "theme": theme, "question": q_text, "source": source}
+
+    # Ensure session writes nested dict changes
+    session["quiz_state"] = state
+    session.modified = True
 
     return jsonify({
-        "id": QUESTION_NUMBER,
-        "question": q["question"],
-        "answers": q["answers"],
-        "category": final_theme,
-        "difficulty": q["difficulty"],
+        "id": state["question_number"],
+        "question": q_text,
+        "answers": a,
+        "difficulty": d,
+        "category": theme,
         "source": source
     })
 
-
-# -----------------------------------------------------
-# ROUTE : ANSWER
-# -----------------------------------------------------
+# =====================================================
+# ANSWER - FIXED (NO MORE KeyError)
+# =====================================================
+@login_required
 @app.route("/api/answer", methods=["POST"])
 def answer():
-    global LAST_CORRECT_ANSWER, USER_SCORE, THEME_STATS, LAST_CATEGORY, LAST_DIFFICULTY, LAST_SOURCE, API_STATS
+    state = session.get("quiz_state")
+    if not state:
+        return jsonify({"error": "Quiz not started"}), 400
 
-    data = request.get_json()
-    question_id = data.get("question_id")
+    last = state.get("last") or {}
+    if "correct" not in last or "theme" not in last:
+        # This prevents crashing and tells the frontend what's wrong
+        return jsonify({"error": "No active question to answer"}), 400
+
+    data = request.get_json(silent=True) or {}
     user_answer = data.get("answer")
 
-    correct = (user_answer == LAST_CORRECT_ANSWER)
+    correct = (user_answer == last["correct"])
+
+    theme = last["theme"]
+    state.setdefault("theme_stats", {})
+    state["theme_stats"].setdefault(theme, {"total": 0, "correct": 0})
+    state["theme_stats"][theme]["total"] += 1
+
+    state.setdefault("score", 0)
+    state.setdefault("current_streak", 0)
+    state.setdefault("best_streak", 0)
 
     if correct:
-        USER_SCORE += 1
+        state["score"] += 1
+        state["current_streak"] += 1
+        state["best_streak"] = max(state["best_streak"], state["current_streak"])
+        state["theme_stats"][theme]["correct"] += 1
+    else:
+        state["current_streak"] = 0
 
-    theme = LAST_CATEGORY or "General Knowledge"
-
-    if theme not in THEME_STATS:
-        THEME_STATS[theme] = {"correct": 0, "total": 0}
-
-    THEME_STATS[theme]["total"] += 1
-    if correct:
-        THEME_STATS[theme]["correct"] += 1
-
-    # Update API source stats
-    source = LAST_SOURCE or "Unknown"
-    if source not in API_STATS:
-        API_STATS[source] = {"correct": 0, "total": 0}
-    API_STATS[source]["total"] += 1
-    if correct:
-        API_STATS[source]["correct"] += 1
-
-    entry = {
-        "question_id": question_id,
-        "user_answer": user_answer,
-        "correct_answer": LAST_CORRECT_ANSWER,
-        "correct": correct,
-        "score_after": USER_SCORE,
-        "category": theme,
-        "difficulty": LAST_DIFFICULTY,
-        "source": source
-    }
-    save_user_stat(entry)
+    session["quiz_state"] = state
+    session.modified = True
 
     return jsonify({
         "status": "success" if correct else "fail",
-        "correct": LAST_CORRECT_ANSWER,
-        "score": USER_SCORE,
-        "source": source
+        "correct": last["correct"],
+        "score": state["score"]
     })
 
+# =====================================================
+# END SESSION (3B) + keep persistence of theme stats (3A)
+# =====================================================
+@login_required
+@app.route("/api/session/end", methods=["POST"])
+def end_session():
+    user = get_current_user()
+    state = session.get("quiz_state")
+    if not state:
+        return jsonify({"error": "No active session"}), 400
 
-# -----------------------------------------------------
-# ROUTE : THEME STATS
-# -----------------------------------------------------
+    for theme, s in state["theme_stats"].items():
+        row = UserThemeStats.query.filter_by(
+            user_id=user.id, theme=theme
+        ).first()
+        if not row:
+            row = UserThemeStats(user_id=user.id, theme=theme)
+            db.session.add(row)
+
+        row.total_questions += s["total"]
+        row.correct_answers += s["correct"]
+        row.best_streak = max(row.best_streak, state["best_streak"])
+        row.last_played = datetime.utcnow()
+
+    db.session.commit()
+    session.pop("quiz_state", None)
+    return jsonify({"status": "saved"})
+
+# =====================================================
+# STATS (SESSION)
+# =====================================================
+@login_required
 @app.route("/api/stats")
-def get_stats():
-    stats_out = []
-
-    for theme, data in THEME_STATS.items():
-        if data["total"] > 0:
-            percent = round(100 * data["correct"] / data["total"], 1)
-        else:
-            percent = 0.0
-
-        stats_out.append({
+def stats():
+    state = session.get("quiz_state", {})
+    result = []
+    for theme, s in state.get("theme_stats", {}).items():
+        pct = round(100 * s["correct"] / s["total"], 1) if s["total"] else 0
+        result.append({
             "theme": theme,
-            "correct": data["correct"],
-            "total": data["total"],
-            "percent": percent
+            "correct": s["correct"],
+            "total": s["total"],
+            "percent": pct
         })
+    return jsonify(result)
 
-    return jsonify(stats_out)
-
-
-# -----------------------------------------------------
-# ROUTE : API SOURCE STATS
-# -----------------------------------------------------
-@app.route("/api/api_stats")
-def get_api_stats():
-    out = []
-    for src, data in API_STATS.items():
-        total = data["total"]
-        percent = round(100 * data["correct"] / total, 1) if total > 0 else 0.0
-        out.append({
-            "source": src,
-            "correct": data["correct"],
-            "total": total,
-            "percent": percent
-        })
-    return jsonify(out)
-
-
-# -----------------------------------------------------
+# =====================================================
 # MAIN
-# -----------------------------------------------------
+# =====================================================
+
+@app.route("/api/profile")
+@login_required
+def api_profile():
+    user = get_current_user()
+
+    stats = UserThemeStats.query.filter_by(user_id=user.id).all()
+
+    total_questions = 0
+    themes = []
+    best_streak = 0
+
+    for s in stats:
+        total_questions += s.total_questions
+        best_streak = max(best_streak, s.best_streak)
+
+        percent = round(
+            (s.correct_answers / s.total_questions) * 100, 1
+        ) if s.total_questions > 0 else 0
+
+        themes.append({
+            "theme": s.theme,
+            "total": s.total_questions,
+            "correct": s.correct_answers,
+            "percent": percent
+        })
+
+    return jsonify({
+        "username": user.username,
+        "total_questions": total_questions,
+        "themes": themes,
+        "best_streak": best_streak
+    })
+
+with app.app_context():
+    db.create_all()
+
 if __name__ == "__main__":
     app.run(debug=True)

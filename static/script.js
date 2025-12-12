@@ -721,3 +721,80 @@ function buildThemeComment(percent, isTop) {
 document.getElementById("restart-session").addEventListener("click", () => {
     window.location.reload();
 });
+// ----------------------------------------------------
+// HEADER ACTIONS
+// ----------------------------------------------------
+const profileBtn = document.getElementById("profile-btn");
+const logoutBtn = document.getElementById("logout-btn");
+
+if (profileBtn) {
+    if (window.location.pathname === "/profile") {
+        profileBtn.textContent = "Return to quiz";
+        profileBtn.onclick = () => {
+            window.location.href = "/app";
+        };
+    } else {
+        profileBtn.textContent = "Your Trickia profile";
+        profileBtn.onclick = () => {
+            window.location.href = "/profile";
+        };
+    }
+}
+
+if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+        window.location.href = "/logout";
+    });
+}
+
+// ----------------------------------------------------
+// PROFILE PAGE LOGIC
+// ----------------------------------------------------
+if (window.location.pathname === "/profile") {
+    fetch("/api/profile")
+        .then(res => {
+            if (!res.ok) throw new Error("Not authenticated");
+            return res.json();
+        })
+        .then(data => {
+            // Username
+            document.getElementById("profile-username").textContent = data.username;
+
+            // Total questions
+            document.getElementById("profile-total-questions")
+                .textContent = `You answered ${data.total_questions} questions`;
+
+            // Best streak
+            const streakEl = document.getElementById("profile-best-streak");
+            streakEl.textContent = `Best streak: ${data.best_streak}`;
+
+            streakEl.className = "";
+            if (data.best_streak >= 5) streakEl.classList.add("streak-5");
+            else if (data.best_streak === 4) streakEl.classList.add("streak-4");
+            else if (data.best_streak === 3) streakEl.classList.add("streak-3");
+            else if (data.best_streak === 2) streakEl.classList.add("streak-2");
+            else if (data.best_streak === 1) streakEl.classList.add("streak-1");
+
+            // Theme performance
+            const list = document.getElementById("profile-theme-list");
+            list.innerHTML = "";
+
+            if (data.themes.length === 0) {
+                list.innerHTML = "<li>No data yet. Play some quizzes!</li>";
+                return;
+            }
+
+            data.themes.forEach(t => {
+                const li = document.createElement("li");
+                li.innerHTML = `
+                    <strong>${t.theme}</strong> — ${t.percent}%
+                    (${t.correct}/${t.total})
+                `;
+                list.appendChild(li);
+            });
+        })
+        .catch(err => {
+            console.error("Profile error:", err);
+            window.location.href = "/login";
+        });
+}

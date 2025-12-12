@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Trickia — Register</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body class="auth-page">
+  <!-- HEADER -->
+  <header class="auth-header">
+    <div class="logo-block">
+      <h1 class="logo">Trickia</h1>
+      <p class="subtitle">Sharpen your knowledge</p>
+    </div>
+
+    <button id="theme-toggle">🌙</button>
+  </header>
+
+  <!-- MAIN -->
+  <main class="auth-container">
+    <div class="auth-card">
+      <h2>Create your account</h2>
+      <p class="auth-subtitle">Join Trickia and track your progress</p>
+
+      <form method="POST" class="auth-form">
+        <input type="text" name="username" placeholder="Username" required />
+        <input type="password" name="password" placeholder="Password" required />
+
+        <button type="submit" class="primary-btn">
+          Create my Trickia account
+        </button>
+      </form>
+
+      <p class="auth-footer">
+        Already have an account?
+        <a href="/login">Log in</a>
+      </p>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
