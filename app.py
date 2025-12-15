@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, send_from_directory, redirect, session
+from flask import Flask, jsonify, request, redirect, session, render_template
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from functools import wraps
@@ -11,7 +11,7 @@ import hashlib
 # =====================================================
 # APP & DB CONFIG
 # =====================================================
-app = Flask(__name__, static_folder="static", static_url_path="")
+app = Flask(__name__, static_folder="static", static_url_path="/static")
 app.secret_key = "change_this_secret_key"
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///trickia.db"
@@ -92,13 +92,13 @@ def index():
 def app_page():
     if not get_current_user():
         return redirect("/login")
-    return send_from_directory("static", "index.html")
+    return render_template("index.html")
 
 @app.route("/profile")
 def profile():
     if not get_current_user():
         return redirect("/login")
-    return send_from_directory("static", "profile.html")
+    return render_template("profile.html")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -110,7 +110,7 @@ def login():
             return "Invalid credentials", 401
         session["user_id"] = user.id
         return redirect("/app")
-    return send_from_directory("static", "login.html")
+    return render_template("login.html")
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -124,7 +124,7 @@ def register():
         db.session.commit()
         session["user_id"] = user.id
         return redirect("/app")
-    return send_from_directory("static", "register.html")
+    return render_template("register.html")
 
 @app.route("/logout")
 def logout():
@@ -160,11 +160,21 @@ def fetch_opentdb(category_id):
     url = "https://opentdb.com/api.php?amount=1&type=multiple"
     if category_id:
         url += f"&category={category_id}"
-    q = requests.get(url, timeout=5).json()["results"][0]
+
+    r = requests.get(url, timeout=5)
+    data = r.json()
+
+    # 🔐 Validation stricte
+    if "results" not in data or not data["results"]:
+        raise ValueError("OpenTriviaDB returned no results")
+
+    q = data["results"][0]
+
     question = html.unescape(q["question"])
     correct = html.unescape(q["correct_answer"])
     answers = [html.unescape(a) for a in q["incorrect_answers"]] + [correct]
     random.shuffle(answers)
+
     return question, correct, answers, q["difficulty"]
 
 def fetch_triviaapi():
@@ -204,109 +214,100 @@ def start_session():
 @app.route("/api/question")
 def question():
     user = get_current_user()
-
     state = session.get("quiz_state")
+
     if not state:
         return jsonify({"error": "Quiz not started"}), 400
 
     cid = request.args.get("category", type=int)
     requested_theme = canonical_theme_from_opentdb_id(cid)
 
-    # Source selection logic (3C)
-    forced_source = "OpenTriviaDB" if (cid is not None) else None
-    # If you want to keep your special forcing, use:
-    # forced_source = "OpenTriviaDB" if (cid in [19, 20] or cid) else None
-
+    state.setdefault("used_hashes", [])
     chosen = None
 
-    # Retry up to N times to avoid duplicates (persisted + session)
-    for _attempt in range(5):
-        source = forced_source or random.choice(["OpenTriviaDB", "TheTriviaAPI"])
-        theme = requested_theme
+    # --------------------------------------------------
+    # SAFE FETCH WITH RETRIES
+    # --------------------------------------------------
+    for _ in range(6):
+        try:
+            source = random.choice(["OpenTriviaDB", "TheTriviaAPI"])
+            theme = requested_theme
 
-        if source == "OpenTriviaDB":
-            q_text, c, a, d = fetch_opentdb(cid)
-        else:
-            q_text, c, a, d, raw = fetch_triviaapi()
-            raw = (raw or "").lower()
-            if "music" in raw:
-                theme = "Music"
-            elif "history" in raw or "politics" in raw:
-                theme = "History"
-            elif "film" in raw or "tv" in raw:
-                theme = "Television"
-            elif "science" in raw:
-                theme = "Science"
+            if source == "OpenTriviaDB":
+                q_text, c, a, d = fetch_opentdb(cid)
+            else:
+                q_text, c, a, d, raw = fetch_triviaapi()
+                raw = (raw or "").lower()
+                if "music" in raw:
+                    theme = "Music"
+                elif "history" in raw or "politics" in raw:
+                    theme = "History"
+                elif "film" in raw or "tv" in raw:
+                    theme = "Television"
+                elif "science" in raw:
+                    theme = "Science"
 
-        # Session-level dedupe
-        session_key = (source, q_text)
-        if session_key in state.get("used_questions", []):
-            continue
+            q_hash = compute_question_hash(q_text)
 
-        # Persistent dedupe (per user)
-        h = compute_question_hash(q_text)
-        seen = UserSeenQuestion.query.filter_by(user_id=user.id, question_hash=h).first()
-        if seen:
-            continue
+            # Session-level dedupe (ABSOLUTE)
+            if q_hash in state["used_hashes"]:
+                continue
 
-        chosen = (q_text, c, a, d, theme, source, h, session_key)
-        break
-
-    # Fallback: accept something even if duplicate
-    if chosen is None:
-        source = forced_source or random.choice(["OpenTriviaDB", "TheTriviaAPI"])
-        theme = requested_theme
-
-        if source == "OpenTriviaDB":
-            q_text, c, a, d = fetch_opentdb(cid)
-        else:
-            q_text, c, a, d, raw = fetch_triviaapi()
-            raw = (raw or "").lower()
-            if "music" in raw:
-                theme = "Music"
-            elif "history" in raw or "politics" in raw:
-                theme = "History"
-            elif "film" in raw or "tv" in raw:
-                theme = "Television"
-            elif "science" in raw:
-                theme = "Science"
-
-        h = compute_question_hash(q_text)
-        seen = UserSeenQuestion.query.filter_by(user_id=user.id, question_hash=h).first()
-
-        if seen:
-            seen.last_seen = datetime.utcnow()
-        else:
-            db.session.add(UserSeenQuestion(
+            # Persistent dedupe
+            if UserSeenQuestion.query.filter_by(
                 user_id=user.id,
-                question_hash=h,
-                source=source,
-                theme=theme
-            ))
-        db.session.commit()
+                question_hash=q_hash
+            ).first():
+                continue
 
-        session_key = (source, q_text)
-        state.setdefault("used_questions", [])
-        if session_key not in state["used_questions"]:
-            state["used_questions"].append(session_key)
+            chosen = (q_text, c, a, d, theme, source, q_hash)
+            break
 
-        state["question_number"] = state.get("question_number", 0) + 1
+        except Exception:
+            continue
 
-        # ✅ ALWAYS set last with a predictable schema
-        state["last"] = {"correct": c, "theme": theme, "question": q_text, "source": source}
-
-        # Ensure session writes nested dict changes
-        session["quiz_state"] = state
-        session.modified = True
-
+    # --------------------------------------------------
+    # NO QUESTION FOUND → CLEAN EXIT (NO 500)
+    # --------------------------------------------------
+    if not chosen:
         return jsonify({
-            "id": state["question_number"],
-            "question": q_text,
-            "answers": a,
-            "difficulty": d,
-            "category": theme,
-            "source": source
-        })
+            "error": "No question available"
+        }), 200
+
+    q_text, c, a, d, theme, source, q_hash = chosen
+
+    # --------------------------------------------------
+    # PERSIST SEEN QUESTION
+    # --------------------------------------------------
+    db.session.add(UserSeenQuestion(
+        user_id=user.id,
+        question_hash=q_hash,
+        source=source,
+        theme=theme
+    ))
+    db.session.commit()
+
+    state["used_hashes"].append(q_hash)
+    state["question_number"] = state.get("question_number", 0) + 1
+
+    state["last"] = {
+        "correct": c,
+        "theme": theme,
+        "question": q_text,
+        "source": source
+    }
+
+    session["quiz_state"] = state
+    session.modified = True
+
+    return jsonify({
+        "id": state["question_number"],
+        "question": q_text,
+        "answers": a,
+        "difficulty": d,
+        "category": theme,
+        "source": source
+    })
 
     # Normal accepted question
     q_text, c, a, d, theme, source, h, session_key = chosen
@@ -388,30 +389,49 @@ def answer():
 # =====================================================
 # END SESSION (3B) + keep persistence of theme stats (3A)
 # =====================================================
-@login_required
 @app.route("/api/session/end", methods=["POST"])
+@login_required
 def end_session():
     user = get_current_user()
-    state = session.get("quiz_state")
-    if not state:
-        return jsonify({"error": "No active session"}), 400
+    data = request.json or {}
 
-    for theme, s in state["theme_stats"].items():
-        row = UserThemeStats.query.filter_by(
-            user_id=user.id, theme=theme
+    theme_stats = data.get("theme_stats", {})
+    best_streak_session = data.get("best_streak", 0)
+
+    # 🔐 Sécurité : rien à enregistrer
+    if not isinstance(theme_stats, dict) or not theme_stats:
+        return jsonify({"status": "no_stats"}), 200
+
+    for theme, stats in theme_stats.items():
+        total = stats.get("total", 0)
+        correct = stats.get("correct", 0)
+
+        # 🚫 Ignore thèmes sans vraies questions
+        if total <= 0:
+            continue
+
+        entry = UserThemeStats.query.filter_by(
+            user_id=user.id,
+            theme=theme
         ).first()
-        if not row:
-            row = UserThemeStats(user_id=user.id, theme=theme)
-            db.session.add(row)
 
-        row.total_questions += s["total"]
-        row.correct_answers += s["correct"]
-        row.best_streak = max(row.best_streak, state["best_streak"])
-        row.last_played = datetime.utcnow()
+        if not entry:
+            entry = UserThemeStats(
+                user_id=user.id,
+                theme=theme,
+                total_questions=0,
+                correct_answers=0,
+                best_streak=0
+            )
+            db.session.add(entry)
+
+        entry.total_questions += total
+        entry.correct_answers += correct
+        entry.best_streak = max(entry.best_streak, best_streak_session)
+        entry.last_played = datetime.utcnow()
 
     db.session.commit()
-    session.pop("quiz_state", None)
-    return jsonify({"status": "saved"})
+    return jsonify({"status": "ok"})
 
 # =====================================================
 # STATS (SESSION)
@@ -462,11 +482,11 @@ def api_profile():
         })
 
     return jsonify({
-        "username": user.username,
-        "total_questions": total_questions,
-        "themes": themes,
-        "best_streak": best_streak
-    })
+    "username": user.username,
+    "total_questions": total_questions,
+    "best_streak": best_streak,
+    "themes": themes
+})
 
 with app.app_context():
     db.create_all()

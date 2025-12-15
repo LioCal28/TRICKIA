@@ -939,3 +939,52 @@ body.dark #progress-container {
   width: 0%;
   transition: width 0.6s ease;
 }
+
+/* =========================
+   PROFILE – STREAK CARD
+========================= */
+
+.profile-extra {
+  display: flex;
+  justify-content: center;
+  margin: 30px 0;
+}
+
+.streak-card {
+  background: linear-gradient(
+    135deg,
+    var(--primary),
+    var(--primary-dark)
+  );
+  color: white;
+  border-radius: 20px;
+  padding: 26px 36px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+  animation: streakAppear 0.6s ease-out;
+}
+
+.streak-value {
+  font-size: 3.2rem;
+  font-weight: 800;
+  line-height: 1;
+  text-shadow: 0 0 12px rgba(255,255,255,0.4);
+}
+
+.streak-label {
+  margin-top: 8px;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  opacity: 0.9;
+}
+
+@keyframes streakAppear {
+  from {
+    transform: translateY(10px) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}

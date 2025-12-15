@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Trickia — Login</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body class="auth-page">
@@ -20,7 +20,7 @@
   <!-- MAIN -->
   <main class="auth-container">
     <div class="auth-card">
-      <h2>Welcome back</h2>
+      <h2>Welcome to Trickia !</h2>
       <p class="auth-subtitle">Log in to continue your Trickia journey</p>
 
       <form method="POST" class="auth-form">
@@ -39,6 +39,6 @@
     </div>
   </main>
 
-  <script src="script.js"></script>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
