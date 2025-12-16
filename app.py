@@ -3,6 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from functools import wraps
 from datetime import datetime
+from services.themes import get_all_trickia_themes, is_valid_trickia_theme, get_opentdb_categories, get_triviaapi_tags
 import requests
 import html
 import random
@@ -54,6 +55,17 @@ class UserSeenQuestion(db.Model):
 
     __table_args__ = (
         db.UniqueConstraint("user_id", "question_hash", name="uq_user_question"),
+    )
+
+class UserAchievement(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    label = db.Column(db.String(100), nullable=False)
+    count = db.Column(db.Integer, default=1)
+    unlocked_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    __table_args__ = (
+        db.UniqueConstraint("user_id", "label", name="uq_user_achievement"),
     )
 
 # =====================================================
@@ -132,28 +144,6 @@ def logout():
     return redirect("/login")
 
 # =====================================================
-# CATEGORY NORMALIZATION
-# =====================================================
-OPENTDB_ID_TO_NAME = {
-    9: "General Knowledge", 10: "Books", 11: "Film", 12: "Music",
-    14: "Television", 15: "Video Games", 17: "Science",
-    18: "Computers", 19: "Mathematics", 20: "Mythology",
-    21: "Sports", 22: "Geography", 23: "History", 24: "Politics"
-}
-
-def canonical_theme_from_opentdb_id(cid):
-    name = OPENTDB_ID_TO_NAME.get(cid, "").lower()
-    if "math" in name: return "Mathematics"
-    if "science" in name: return "Science"
-    if "history" in name or "politics" in name: return "History"
-    if "music" in name: return "Music"
-    if "film" in name or "television" in name: return "Television"
-    if "mythology" in name: return "Mythology"
-    if "sports" in name: return "Sports"
-    if "geography" in name: return "Geography"
-    return "General Knowledge"
-
-# =====================================================
 # TRIVIA FETCH
 # =====================================================
 def fetch_opentdb(category_id):
@@ -177,16 +167,28 @@ def fetch_opentdb(category_id):
 
     return question, correct, answers, q["difficulty"]
 
-def fetch_triviaapi():
-    q = requests.get(
-        "https://the-trivia-api.com/v2/questions?limit=1",
-        timeout=5
-    ).json()[0]
+def fetch_triviaapi(tags=None):
+    url = "https://the-trivia-api.com/v2/questions?limit=1"
+
+    if tags:
+        # ex: categories=science,history
+        joined = ",".join(tags)
+        url += f"&categories={joined}"
+
+    q = requests.get(url, timeout=5).json()[0]
+
     question = q["question"]["text"]
     correct = q["correctAnswer"]
     answers = q["incorrectAnswers"] + [correct]
     random.shuffle(answers)
-    return question, correct, answers, q.get("difficulty", "unknown"), q.get("category", "")
+
+    return (
+        question,
+        correct,
+        answers,
+        q.get("difficulty", "unknown"),
+        q.get("category", "")
+    )
 
 # =====================================================
 # SESSION START
@@ -194,6 +196,22 @@ def fetch_triviaapi():
 @login_required
 @app.route("/api/session/start", methods=["POST"])
 def start_session():
+    data = request.get_json(silent=True) or {}
+
+    # ✅ thèmes choisis par l'utilisateur (Trickia themes)
+    selected = data.get("themes")
+
+    # Fallback : si rien reçu → tous les thèmes Trickia
+    if not selected:
+        selected = get_all_trickia_themes()
+
+    # Nettoyage de sécurité : garder uniquement des thèmes Trickia valides
+    selected = [t for t in selected if is_valid_trickia_theme(t)]
+
+    # Fallback ultime : si tout a été filtré
+    if not selected:
+        selected = get_all_trickia_themes()
+
     session["quiz_state"] = {
         "question_number": 0,
         "score": 0,
@@ -202,9 +220,20 @@ def start_session():
         "best_streak": 0,
         "current_streak": 0,
         "start_time": datetime.utcnow(),
-        "last": {}
+        "last": {},
+
+        # ✅ NEW: thèmes autorisés pour cette session
+        "allowed_themes": selected,
+
+        # 📊 API STATS (SESSION-BASED)
+        "api_stats": {
+            "OpenTriviaDB": {"total": 0, "correct": 0},
+            "TheTriviaAPI": {"total": 0, "correct": 0}
+        }
     }
-    return jsonify({"status": "ok"})
+
+    session.modified = True
+    return jsonify({"status": "ok", "allowed_themes": selected})
 
 # =====================================================
 # QUESTION (STEP 4: PERSISTENT ANTI-DUPLICATES)
@@ -219,41 +248,44 @@ def question():
     if not state:
         return jsonify({"error": "Quiz not started"}), 400
 
-    cid = request.args.get("category", type=int)
-    requested_theme = canonical_theme_from_opentdb_id(cid)
+    allowed = state.get("allowed_themes") or get_all_trickia_themes()
 
-    state.setdefault("used_hashes", [])
     chosen = None
 
     # --------------------------------------------------
-    # SAFE FETCH WITH RETRIES
+    # SAFE FETCH WITH TRICKIA THEMES + DEDUPE
     # --------------------------------------------------
     for _ in range(6):
         try:
-            source = random.choice(["OpenTriviaDB", "TheTriviaAPI"])
-            theme = requested_theme
+            # 🎯 1. Choose Trickia theme
+            theme = random.choice(allowed)
 
-            if source == "OpenTriviaDB":
+            opentdb_cats = get_opentdb_categories(theme)
+            trivia_tags = get_triviaapi_tags(theme)
+
+            # 🎯 2. Choose source (MIXED APIs - SAFE)
+            use_triviaapi = bool(trivia_tags) and random.random() < 0.3
+
+            if opentdb_cats and not use_triviaapi:
+                cid = random.choice(opentdb_cats)
                 q_text, c, a, d = fetch_opentdb(cid)
-            else:
-                q_text, c, a, d, raw = fetch_triviaapi()
-                raw = (raw or "").lower()
-                if "music" in raw:
-                    theme = "Music"
-                elif "history" in raw or "politics" in raw:
-                    theme = "History"
-                elif "film" in raw or "tv" in raw:
-                    theme = "Television"
-                elif "science" in raw:
-                    theme = "Science"
+                source = "OpenTriviaDB"
 
+            elif trivia_tags:
+                q_text, c, a, d, _ = fetch_triviaapi(trivia_tags)
+                source = "TheTriviaAPI"
+
+            else:
+                continue
+
+            # 🎯 3. Hash & dedupe
             q_hash = compute_question_hash(q_text)
 
-            # Session-level dedupe (ABSOLUTE)
+            state.setdefault("used_hashes", [])
+
             if q_hash in state["used_hashes"]:
                 continue
 
-            # Persistent dedupe
             if UserSeenQuestion.query.filter_by(
                 user_id=user.id,
                 question_hash=q_hash
@@ -266,18 +298,13 @@ def question():
         except Exception:
             continue
 
-    # --------------------------------------------------
-    # NO QUESTION FOUND → CLEAN EXIT (NO 500)
-    # --------------------------------------------------
     if not chosen:
-        return jsonify({
-            "error": "No question available"
-        }), 200
+        return jsonify({"error": "No question available"}), 200
 
     q_text, c, a, d, theme, source, q_hash = chosen
 
     # --------------------------------------------------
-    # PERSIST SEEN QUESTION
+    # Persist question
     # --------------------------------------------------
     db.session.add(UserSeenQuestion(
         user_id=user.id,
@@ -291,43 +318,14 @@ def question():
     state["question_number"] = state.get("question_number", 0) + 1
 
     state["last"] = {
-        "correct": c,
-        "theme": theme,
         "question": q_text,
+        "correct": c,
+        "answers": a,
+        "difficulty": d,
+        "theme": theme,   # ✅ Trickia theme ONLY
         "source": source
     }
 
-    session["quiz_state"] = state
-    session.modified = True
-
-    return jsonify({
-        "id": state["question_number"],
-        "question": q_text,
-        "answers": a,
-        "difficulty": d,
-        "category": theme,
-        "source": source
-    })
-
-    # Normal accepted question
-    q_text, c, a, d, theme, source, h, session_key = chosen
-
-    db.session.add(UserSeenQuestion(
-        user_id=user.id,
-        question_hash=h,
-        source=source,
-        theme=theme
-    ))
-    db.session.commit()
-
-    state.setdefault("used_questions", [])
-    state["used_questions"].append(session_key)
-    state["question_number"] = state.get("question_number", 0) + 1
-
-    # ✅ ALWAYS set last with a predictable schema
-    state["last"] = {"correct": c, "theme": theme, "question": q_text, "source": source}
-
-    # Ensure session writes nested dict changes
     session["quiz_state"] = state
     session.modified = True
 
@@ -351,37 +349,63 @@ def answer():
         return jsonify({"error": "Quiz not started"}), 400
 
     last = state.get("last") or {}
-    if "correct" not in last or "theme" not in last:
-        # This prevents crashing and tells the frontend what's wrong
+    if "correct" not in last or "theme" not in last or "source" not in last:
         return jsonify({"error": "No active question to answer"}), 400
 
     data = request.get_json(silent=True) or {}
     user_answer = data.get("answer")
 
-    correct = (user_answer == last["correct"])
+    is_correct = (user_answer == last["correct"])
 
+    # -----------------------------
+    # THEME STATS (SESSION)
+    # -----------------------------
     theme = last["theme"]
     state.setdefault("theme_stats", {})
     state["theme_stats"].setdefault(theme, {"total": 0, "correct": 0})
     state["theme_stats"][theme]["total"] += 1
 
+    # -----------------------------
+    # SCORE & STREAK
+    # -----------------------------
     state.setdefault("score", 0)
     state.setdefault("current_streak", 0)
     state.setdefault("best_streak", 0)
 
-    if correct:
+    if is_correct:
         state["score"] += 1
         state["current_streak"] += 1
-        state["best_streak"] = max(state["best_streak"], state["current_streak"])
+        state["best_streak"] = max(
+            state["best_streak"],
+            state["current_streak"]
+        )
         state["theme_stats"][theme]["correct"] += 1
     else:
         state["current_streak"] = 0
 
+    # -----------------------------
+    # 📊 API STATS (SESSION)
+    # -----------------------------
+    state.setdefault("api_stats", {})
+    source = last.get("source")
+
+    if source:
+        state["api_stats"].setdefault(
+            source,
+            {"total": 0, "correct": 0}
+        )
+        state["api_stats"][source]["total"] += 1
+        if is_correct:
+            state["api_stats"][source]["correct"] += 1
+
+    # -----------------------------
+    # SAVE SESSION
+    # -----------------------------
     session["quiz_state"] = state
     session.modified = True
 
     return jsonify({
-        "status": "success" if correct else "fail",
+        "status": "success" if is_correct else "fail",
         "correct": last["correct"],
         "score": state["score"]
     })
@@ -392,46 +416,72 @@ def answer():
 @app.route("/api/session/end", methods=["POST"])
 @login_required
 def end_session():
-    user = get_current_user()
-    data = request.json or {}
+        user = get_current_user()
+        data = request.json or {}
 
-    theme_stats = data.get("theme_stats", {})
-    best_streak_session = data.get("best_streak", 0)
+        theme_stats = data.get("theme_stats", {})
+        best_streak_session = data.get("best_streak", 0)
 
-    # 🔐 Sécurité : rien à enregistrer
-    if not isinstance(theme_stats, dict) or not theme_stats:
-        return jsonify({"status": "no_stats"}), 200
+        # 🔐 Sécurité : rien à enregistrer
+        if not isinstance(theme_stats, dict) or not theme_stats:
+            return jsonify({"status": "no_stats"}), 200
 
-    for theme, stats in theme_stats.items():
-        total = stats.get("total", 0)
-        correct = stats.get("correct", 0)
+        for theme, stats in theme_stats.items():
+            total = stats.get("total", 0)
+            correct = stats.get("correct", 0)
 
-        # 🚫 Ignore thèmes sans vraies questions
-        if total <= 0:
-            continue
+            # 🚫 Ignore thèmes sans vraies questions
+            if total <= 0:
+                continue
 
-        entry = UserThemeStats.query.filter_by(
-            user_id=user.id,
-            theme=theme
-        ).first()
-
-        if not entry:
-            entry = UserThemeStats(
+            entry = UserThemeStats.query.filter_by(
                 user_id=user.id,
-                theme=theme,
-                total_questions=0,
-                correct_answers=0,
-                best_streak=0
-            )
-            db.session.add(entry)
+                theme=theme
+            ).first()
 
-        entry.total_questions += total
-        entry.correct_answers += correct
-        entry.best_streak = max(entry.best_streak, best_streak_session)
-        entry.last_played = datetime.utcnow()
+            if not entry:
+                entry = UserThemeStats(
+                    user_id=user.id,
+                    theme=theme,
+                    total_questions=0,
+                    correct_answers=0,
+                    best_streak=0
+                )
+                db.session.add(entry)
 
-    db.session.commit()
-    return jsonify({"status": "ok"})
+            # 📊 Update stats
+            entry.total_questions += total
+            entry.correct_answers += correct
+            entry.best_streak = max(entry.best_streak, best_streak_session)
+            entry.last_played = datetime.utcnow()
+
+            # 🏆 ACHIEVEMENT: Expert in <theme> (SESSION-BASED ONLY)
+            accuracy = correct / total if total > 0 else 0
+
+            # 🎯 Conditions strictes
+            if total >= 2 and accuracy >= 0.85:
+                label = f"Expert in {theme}!"
+
+                achievement = UserAchievement.query.filter_by(
+                    user_id=user.id,
+                    label=label
+                ).first()
+
+                if achievement:
+                    # ➕ Badge déjà existant → on incrémente
+                    achievement.count += 1
+                else:
+                    # 🆕 Nouveau badge réellement gagné
+                    db.session.add(
+                        UserAchievement(
+                            user_id=user.id,
+                            label=label,
+                            count=1
+                        )
+                    )
+
+        db.session.commit()
+        return jsonify({"status": "ok"})
 
 # =====================================================
 # STATS (SESSION)
@@ -452,6 +502,30 @@ def stats():
     return jsonify(result)
 
 # =====================================================
+# API STATS (SESSION-BASED)
+# =====================================================
+@login_required
+@app.route("/api/api_stats")
+def api_stats():
+    state = session.get("quiz_state", {})
+    api_stats = state.get("api_stats", {})
+
+    result = []
+    for source, s in api_stats.items():
+        total = s.get("total", 0)
+        correct = s.get("correct", 0)
+        percent = round((correct / total) * 100, 1) if total > 0 else 0
+
+        result.append({
+            "source": source,
+            "total": total,
+            "correct": correct,
+            "percent": percent
+        })
+
+    return jsonify(result)
+
+# =====================================================
 # MAIN
 # =====================================================
 
@@ -460,33 +534,49 @@ def stats():
 def api_profile():
     user = get_current_user()
 
-    stats = UserThemeStats.query.filter_by(user_id=user.id).all()
+    # --- THEME STATS ---
+    theme_entries = UserThemeStats.query.filter_by(user_id=user.id).all()
 
-    total_questions = 0
     themes = []
-    best_streak = 0
+    total_questions = 0
+    best_streak_global = 0
 
-    for s in stats:
-        total_questions += s.total_questions
-        best_streak = max(best_streak, s.best_streak)
-
-        percent = round(
-            (s.correct_answers / s.total_questions) * 100, 1
-        ) if s.total_questions > 0 else 0
+    for entry in theme_entries:
+        total = entry.total_questions
+        correct = entry.correct_answers
+        percent = round((correct / total) * 100, 1) if total > 0 else 0
 
         themes.append({
-            "theme": s.theme,
-            "total": s.total_questions,
-            "correct": s.correct_answers,
+            "theme": entry.theme,
+            "total": total,
+            "correct": correct,
             "percent": percent
         })
+
+        total_questions += total
+        best_streak_global = max(best_streak_global, entry.best_streak)
+
+    # --- ACHIEVEMENTS ---
+    achievements = UserAchievement.query.filter_by(user_id=user.id).all()
 
     return jsonify({
     "username": user.username,
     "total_questions": total_questions,
-    "best_streak": best_streak,
-    "themes": themes
+    "best_streak": best_streak_global,
+    "themes": themes,
+    "achievements": [
+        {
+            "label": a.label,
+            "count": a.count,
+            "unlocked_at": a.unlocked_at.isoformat()
+        } for a in achievements
+    ]
 })
+
+@app.route("/api/themes")
+@login_required
+def get_themes():
+    return jsonify(get_all_trickia_themes())
 
 with app.app_context():
     db.create_all()

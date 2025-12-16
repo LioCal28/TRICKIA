@@ -17,6 +17,7 @@ let quizTotalTimeSeconds = 0;
 let currentStreak = 0;
 let bestStreak = 0;
 
+let canLoadNextQuestion = false;
 
 // ----------------------------------------------------
 // THEME MODE (dark / light)
@@ -57,30 +58,22 @@ if (welcomeBtn) {
 // LOAD CATEGORIES ON PAGE LOAD
 // ----------------------------------------------------
 window.addEventListener("load", async () => {
-    // Load OpenTrivia categories for theme selector
-    try {
-        const res = await fetch("https://opentdb.com/api_category.php");
-        const categories = (await res.json()).trivia_categories;
+    const res = await fetch("/api/themes");
+    const themes = await res.json();
 
-        const list = document.getElementById("theme-checkboxes");
-        if (list) {
-            categories.forEach(cat => {
-                let name = cat.name;
-                if (name.startsWith("Entertainment:")) {
-                    name = name.split(":")[1].trim();
-                }
-                const li = document.createElement("li");
-                li.innerHTML = `
-                    <label>
-                        <input type="checkbox" class="theme-check" value="${cat.id}" checked>
-                        ${name}
-                    </label>`;
-                list.appendChild(li);
-            });
-        }
-    } catch (err) {
-        console.error("Erreur chargement catégories :", err);
-    }
+    const list = document.getElementById("theme-checkboxes");
+    list.innerHTML = "";
+
+    themes.forEach(theme => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+            <label>
+                <input type="checkbox" class="theme-check" value="${theme}" checked>
+                ${theme}
+            </label>
+        `;
+        list.appendChild(li);
+    });
 
     // Tooltip for pie chart (session-based)
     const canvas = document.getElementById("piechart");
@@ -240,7 +233,11 @@ window.addEventListener("load", async () => {
 
         // Inform backend of new session (reset used questions, score, stats, etc.)
         try {
-            await fetch("/api/session/start", { method: "POST" });
+            await fetch("/api/session/start", {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({ themes: allowedThemes })
+            });
         } catch (err) {
             console.error("Erreur démarrage session backend :", err);
         }
@@ -256,6 +253,8 @@ window.addEventListener("load", async () => {
         btn.classList.remove("result-button");
         btn.dataset.action = "next";
         btn.classList.remove("loading");
+
+        canLoadNextQuestion = true; // autorise la 1ère question
     }
 
     // Update "Question X / N" text and progress bar
@@ -274,25 +273,29 @@ window.addEventListener("load", async () => {
     // ----------------------------------------------------
     const btnNew = document.getElementById("btn-new");
     if (btnNew) {
-        btnNew.addEventListener("click", () => {
+    btnNew.addEventListener("click", () => {
 
-            // Prevent double trigger
-            if (btnNew.classList.contains("loading")) return;
+        // 🚫 Cas 1 : bouton bloqué (pas répondu ou en chargement)
+        if (!canLoadNextQuestion) return;
 
-            btnNew.classList.add("loading");
+        // 🚫 Cas 2 : déjà en loading
+        if (btnNew.classList.contains("loading")) return;
 
-            setTimeout(() => {
-                btnNew.classList.remove("loading");
+        // 🔒 Verrou immédiat
+        canLoadNextQuestion = false;
+        btnNew.classList.add("loading");
 
-                // If we are at the end, go to results
-                if (btnNew.dataset.action === "results") {
-                    endSession();
-                } else {
-                    loadQuestion();
-                }
-            }, 1500);
-        });
-    }
+        setTimeout(() => {
+            btnNew.classList.remove("loading");
+
+            if (btnNew.dataset.action === "results") {
+                endSession();
+            } else {
+                loadQuestion();
+            }
+        }, 1500);
+    });
+}
 
     async function loadQuestion() {
         // If session finished, don't load any more questions
@@ -301,17 +304,14 @@ window.addEventListener("load", async () => {
         }
 
         let url = "/api/question";
-
-        if (allowedThemes.length > 0) {
-            const theme = allowedThemes[Math.floor(Math.random() * allowedThemes.length)];
-            url += "?category=" + theme;
-        }
-
+        
         try {
+            canLoadNextQuestion = false;
             const response = await fetch(url);
             const data = await response.json();
 
             displayQuestion(data);
+            canLoadNextQuestion = false; // réponse pas encore donnée
 
             // Start global quiz timer when first question is shown
             if (!quizStartTime) {
@@ -455,8 +455,11 @@ window.addEventListener("load", async () => {
                 updateQuestionCounterDisplay();
             }
 
+            canLoadNextQuestion = true;
+
         } catch (err) {
             console.error("Erreur envoi réponse :", err);
+        
         }
     }
 
@@ -782,32 +785,98 @@ window.addEventListener("load", async () => {
                 return res.json();
             })
             .then(data => {
+
+                // -----------------------------
+                // DOM ELEMENTS
+                // -----------------------------
                 const usernameEl = document.getElementById("profile-username");
                 const totalEl = document.getElementById("profile-total-questions");
                 const list = document.getElementById("profile-theme-list");
                 const streakEl = document.getElementById("profile-best-streak");
+                const badgeBox = document.getElementById("profile-badges");
 
                 if (!usernameEl || !totalEl || !list || !streakEl) {
                     console.error("Profile DOM elements missing");
                     return;
                 }
 
-                usernameEl.textContent = data.username;
-                totalEl.textContent = `You answered ${data.total_questions} questions`;
-                streakEl.textContent = `Best streak: ${data.best_streak}`;
+                // -----------------------------
+                // BASIC PROFILE INFO
+                // -----------------------------
+                usernameEl.textContent = data.username || "Your profile";
+                totalEl.textContent = `You answered ${data.total_questions ?? 0} questions`;
 
+                // 🔥 STREAK — value only
+                streakEl.textContent = data.best_streak ?? 0;
+
+                // -----------------------------
+                // THEME STATS
+                // -----------------------------
                 list.innerHTML = "";
 
                 if (!data.themes || data.themes.length === 0) {
                     list.innerHTML = "<li>No data yet. Play some quizzes!</li>";
-                    return;
+                } else {
+
+                    // optionnel : trier par performance décroissante
+                    const sortedThemes = [...data.themes].sort(
+                        (a, b) => b.percent - a.percent
+                    );
+
+                    sortedThemes.forEach(t => {
+                        const li = document.createElement("li");
+                        li.className = "theme-row";
+
+                        li.innerHTML = `
+                            <div class="theme-name">
+                                ${t.theme}
+                                ${t.percent >= 85 ? '<span class="theme-trophy">🏆</span>' : ''}
+                            </div>
+
+                            <div class="theme-percent">
+                                ${t.percent} %
+                                <span>(${t.correct} / ${t.total})</span>
+                            </div>
+
+                            <div class="theme-bar">
+                                <div class="theme-bar-fill" style="width: 0%"></div>
+                            </div>
+                        `;
+
+                        list.appendChild(li);
+
+                        // animation douce de la barre
+                        requestAnimationFrame(() => {
+                            const bar = li.querySelector(".theme-bar-fill");
+                            if (bar) {
+                                bar.style.width = `${t.percent}%`;
+                            }
+                        });
+                    });
                 }
 
-                data.themes.forEach(t => {
-                    const li = document.createElement("li");
-                    li.innerHTML = `<strong>${t.theme}</strong> — ${t.percent}%`;
-                    list.appendChild(li);
-                });
+                // -----------------------------
+                // ACHIEVEMENTS
+                // -----------------------------
+                if (badgeBox) {
+                    badgeBox.innerHTML = "";
+
+                    if (!data.achievements || data.achievements.length === 0) {
+                        const p = document.createElement("p");
+                        p.textContent = "No achievements yet. Keep playing!";
+                        p.style.opacity = "0.7";
+                        badgeBox.appendChild(p);
+                    } else {
+                        data.achievements.forEach(a => {
+                            const badge = document.createElement("div");
+                            badge.className = "badge-hexagon";
+                            badge.textContent =
+                                a.count > 1 ? `x${a.count} ${a.label}` : a.label;
+                            badgeBox.appendChild(badge);
+                        });
+                    }
+                }
+
             })
             .catch(err => {
                 console.error("Profile error:", err);

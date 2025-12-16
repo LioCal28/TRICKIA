@@ -22,24 +22,37 @@
     </div>
   </header>
 
-  <!-- MAIN PROFILE CONTENT -->
   <main class="profile-container">
 
-    <!-- 🔽 ICI : PROFILE HERO -->
+    <!-- PROFILE HERO -->
     <div class="profile-hero">
-      <h1 id="profile-username"></h1>
+      <h1 id="profile-username">Your profile</h1>
       <p id="profile-total-questions"></p>
     </div>
 
-    <!-- 🔽 ICI : THEME STATS -->
-    <div class="profile-stats">
-      <h2>Theme performance</h2>
-      <ul id="profile-theme-list"></ul>
-    </div>
+    <!-- PROFILE GRID -->
+    <div class="profile-grid">
 
-    <!-- 🔽 ICI : EXTRA STATS -->
-    <div class="profile-extra">
-      <p id="profile-best-streak"></p>
+      <!-- LEFT COLUMN : ACHIEVEMENTS -->
+      <aside class="profile-achievements">
+        <h2>Your achievements</h2>
+        <div id="profile-badges"></div>
+      </aside>
+
+      <!-- CENTER COLUMN : THEME STATS -->
+      <section class="profile-stats">
+        <h2>Theme performance</h2>
+        <ul id="profile-theme-list"></ul>
+      </section>
+
+      <!-- RIGHT COLUMN : STREAK -->
+      <aside class="profile-streak">
+        <div class="streak-card small">
+          <div class="streak-value" id="profile-best-streak">0</div>
+          <div class="streak-label">Best streak</div>
+        </div>
+      </aside>
+
     </div>
 
   </main>

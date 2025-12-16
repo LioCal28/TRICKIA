@@ -898,16 +898,25 @@ body.dark #progress-container {
   opacity: 0.8;
 }
 
-.profile-stats {
-  background: var(--card-bg);
-  border-radius: 16px;
-  padding: 30px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+.profile-stats h2 {
+  font-size: 1.7rem;
+  font-weight: 700;
+  margin-bottom: 26px;
+  position: relative;
+  letter-spacing: 0.3px;
 }
 
-.profile-stats h2 {
-  margin-bottom: 20px;
+.profile-stats h2::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 60px;
+  height: 3px;
+  background: var(--primary);
+  border-radius: 2px;
 }
+
 
 .theme-row {
   display: grid;
@@ -915,22 +924,36 @@ body.dark #progress-container {
   align-items: center;
   gap: 12px;
   margin-bottom: 14px;
+  background: var(--accent);
+  border-radius: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.theme-row:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
 }
 
 .theme-name {
   font-weight: 600;
+  font-size: 15px;
 }
 
-.theme-percent {
-  text-align: right;
-  font-weight: 600;
+.theme-percent span {
+  display: block;
+  font-size: 12px;
+  opacity: 0.75;
 }
 
 .theme-bar {
-  height: 10px;
+  height: 12px;
   border-radius: 6px;
   background: var(--border);
   overflow: hidden;
+  grid-column: 1 / -1;
+  margin-top: 6px;
 }
 
 .theme-bar-fill {
@@ -987,4 +1010,79 @@ body.dark #progress-container {
     transform: translateY(0) scale(1);
     opacity: 1;
   }
+}
+
+/* =========================
+   PROFILE – HERO
+========================= */
+
+.profile-hero {
+  background: linear-gradient(
+    135deg,
+    var(--primary-dark),
+    var(--primary)
+  );
+  color: white;
+  border-radius: 20px;
+  padding: 36px 30px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+}
+
+.profile-hero h1 {
+  margin: 0;
+}
+
+.profile-hero p {
+  margin-top: 10px;
+  opacity: 0.9;
+}
+
+/* =========================
+   PROFILE GRID LAYOUT
+========================= */
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: 220px 1fr 180px;
+  gap: 30px;
+  align-items: flex-start;
+}
+
+/* =========================
+   STREAK (SMALL, SIDE)
+========================= */
+
+.profile-streak {
+  position: sticky;
+  top: 100px;
+}
+
+.streak-card.small {
+  padding: 18px 16px;
+  border-radius: 16px;
+}
+
+.streak-card.small .streak-value {
+  font-size: 2.2rem;
+}
+
+.streak-card.small .streak-label {
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+.theme-trophy {
+  margin-left: 6px;
+  font-size: 1.1em;
+}
+
+.profile-achievements h2 {
+  font-size: 1.4rem;
+  margin-bottom: 16px;
+}
+
+#profile-badges {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
