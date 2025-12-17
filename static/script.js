@@ -19,6 +19,38 @@ let bestStreak = 0;
 
 let canLoadNextQuestion = false;
 
+// =============================================
+// PAGE DETECTION (PATCH IA)
+// =============================================
+const IS_PROFILE_PAGE = window.location.pathname.includes("/profile");
+const IS_QUIZ_PAGE = !IS_PROFILE_PAGE;
+
+// ----------------------------------------------------
+    // HEADER ACTIONS
+    // ----------------------------------------------------
+    const profileBtn = document.getElementById("profile-btn");
+    const logoutBtn = document.getElementById("logout-btn");
+
+    if (profileBtn) {
+        if (window.location.pathname === "/profile") {
+            profileBtn.textContent = "Return to quiz";
+            profileBtn.onclick = () => {
+                window.location.href = "/app";
+            };
+        } else {
+            profileBtn.textContent = "Your Trickia profile";
+            profileBtn.onclick = () => {
+                window.location.href = "/profile";
+            };
+        }
+    }
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener("click", () => {
+            window.location.href = "/logout";
+        });
+    }
+
 // ----------------------------------------------------
 // THEME MODE (dark / light)
 // ----------------------------------------------------
@@ -42,7 +74,7 @@ if (themeToggleBtn) {
         themeToggleBtn.textContent = "☼ Light mode";
     }
 }
-
+if (IS_QUIZ_PAGE) {
 // ----------------------------------------------------
 // WELCOME SCREEN
 // ----------------------------------------------------
@@ -223,6 +255,7 @@ window.addEventListener("load", async () => {
         sessionCorrectAnswers = 0;
         lastCorrectGlobal = 0;
         lastTotalGlobal = 0;
+        bestStreak = 0;
 
         drawPieChart(0, 0);
 
@@ -744,141 +777,118 @@ window.addEventListener("load", async () => {
             window.location.reload();
         });
     }
+}
+// =============================================
+// PROFILE PAGE LOGIC (PATCH IA)
+// =============================================
+if (IS_PROFILE_PAGE) {
+  
+    // -----------------------------
+    // PROFILE DATA
+    // -----------------------------
+    fetch("/api/profile")
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("profile-username").textContent = data.username;
+        document.getElementById("profile-total-questions").textContent =
+          `You answered ${data.total_questions} questions`;
+        document.getElementById("profile-best-streak").textContent =
+          data.best_streak ?? 0;
 
-    // ----------------------------------------------------
-    // HEADER ACTIONS
-    // ----------------------------------------------------
-    const profileBtn = document.getElementById("profile-btn");
-    const logoutBtn = document.getElementById("logout-btn");
+        const list = document.getElementById("profile-theme-list");
+        list.innerHTML = "";
 
-    if (profileBtn) {
-        if (window.location.pathname === "/profile") {
-            profileBtn.textContent = "Return to quiz";
-            profileBtn.onclick = () => {
-                window.location.href = "/app";
-            };
+        if (!data.themes.length) {
+          list.innerHTML = "<li>No data yet. Play some quizzes!</li>";
         } else {
-            profileBtn.textContent = "Your Trickia profile";
-            profileBtn.onclick = () => {
-                window.location.href = "/profile";
-            };
-        }
-    }
+          data.themes
+            .sort((a, b) => b.percent - a.percent)
+            .forEach(t => {
+                const row = document.createElement("div");
+                row.className = "theme-row";
 
-    if (logoutBtn) {
-        logoutBtn.addEventListener("click", () => {
-            window.location.href = "/logout";
-        });
-    }
+                row.innerHTML = `
+                <div class="theme-name">${t.theme}</div>
 
-    // ----------------------------------------------------
-    // PROFILE PAGE LOGIC
-    // ----------------------------------------------------
-    document.addEventListener("DOMContentLoaded", () => {
-        if (!window.location.pathname.includes("profile")) return;
+                <div class="theme-percent">
+                    ${t.percent}%
+                    <span>${t.correct}/${t.total}</span>
+                </div>
 
-        console.log("Profile page detected");
+                <div class="theme-bar">
+                    <div class="theme-bar-fill" style="width: ${t.percent}%"></div>
+                </div>
+                `;
 
-        fetch("/api/profile")
-            .then(res => {
-                if (!res.ok) throw new Error("Profile fetch failed");
-                return res.json();
-            })
-            .then(data => {
-
-                // -----------------------------
-                // DOM ELEMENTS
-                // -----------------------------
-                const usernameEl = document.getElementById("profile-username");
-                const totalEl = document.getElementById("profile-total-questions");
-                const list = document.getElementById("profile-theme-list");
-                const streakEl = document.getElementById("profile-best-streak");
-                const badgeBox = document.getElementById("profile-badges");
-
-                if (!usernameEl || !totalEl || !list || !streakEl) {
-                    console.error("Profile DOM elements missing");
-                    return;
-                }
-
-                // -----------------------------
-                // BASIC PROFILE INFO
-                // -----------------------------
-                usernameEl.textContent = data.username || "Your profile";
-                totalEl.textContent = `You answered ${data.total_questions ?? 0} questions`;
-
-                // 🔥 STREAK — value only
-                streakEl.textContent = data.best_streak ?? 0;
-
-                // -----------------------------
-                // THEME STATS
-                // -----------------------------
-                list.innerHTML = "";
-
-                if (!data.themes || data.themes.length === 0) {
-                    list.innerHTML = "<li>No data yet. Play some quizzes!</li>";
-                } else {
-
-                    // optionnel : trier par performance décroissante
-                    const sortedThemes = [...data.themes].sort(
-                        (a, b) => b.percent - a.percent
-                    );
-
-                    sortedThemes.forEach(t => {
-                        const li = document.createElement("li");
-                        li.className = "theme-row";
-
-                        li.innerHTML = `
-                            <div class="theme-name">
-                                ${t.theme}
-                                ${t.percent >= 85 ? '<span class="theme-trophy">🏆</span>' : ''}
-                            </div>
-
-                            <div class="theme-percent">
-                                ${t.percent} %
-                                <span>(${t.correct} / ${t.total})</span>
-                            </div>
-
-                            <div class="theme-bar">
-                                <div class="theme-bar-fill" style="width: 0%"></div>
-                            </div>
-                        `;
-
-                        list.appendChild(li);
-
-                        // animation douce de la barre
-                        requestAnimationFrame(() => {
-                            const bar = li.querySelector(".theme-bar-fill");
-                            if (bar) {
-                                bar.style.width = `${t.percent}%`;
-                            }
-                        });
-                    });
-                }
-
-                // -----------------------------
-                // ACHIEVEMENTS
-                // -----------------------------
-                if (badgeBox) {
-                    badgeBox.innerHTML = "";
-
-                    if (!data.achievements || data.achievements.length === 0) {
-                        const p = document.createElement("p");
-                        p.textContent = "No achievements yet. Keep playing!";
-                        p.style.opacity = "0.7";
-                        badgeBox.appendChild(p);
-                    } else {
-                        data.achievements.forEach(a => {
-                            const badge = document.createElement("div");
-                            badge.className = "badge-hexagon";
-                            badge.textContent =
-                                a.count > 1 ? `x${a.count} ${a.label}` : a.label;
-                            badgeBox.appendChild(badge);
-                        });
-                    }
-                }
-
-            })
-            .catch(err => {
-                console.error("Profile error:", err);
+                list.appendChild(row);
             });
-    });
+        }
+
+        const badges = document.getElementById("profile-badges");
+        badges.innerHTML = "";
+        data.achievements.forEach(a => {
+          const div = document.createElement("div");
+          div.className = "badge";
+          div.textContent = `${a.label} ×${a.count}`;
+          badges.appendChild(div);
+        });
+      });
+
+    // -----------------------------
+    // AI MODEL GRAPH
+    // -----------------------------
+    fetch("/api/model/history")
+      .then(res => res.json())
+      .then(data => {
+        const themes = data.themes || {};
+        const canvas = document.getElementById("model-chart");
+        if (!canvas || Object.keys(themes).length === 0) return;
+
+        const ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const padding = 40;
+        const w = canvas.width - padding * 2;
+        const h = canvas.height - padding * 2;
+
+        const maxStep = Math.max(
+          ...Object.values(themes).flat().map(p => p.step)
+        );
+
+        ctx.strokeStyle = "#888";
+        ctx.beginPath();
+        ctx.moveTo(padding, padding);
+        ctx.lineTo(padding, canvas.height - padding);
+        ctx.lineTo(canvas.width - padding, canvas.height - padding);
+        ctx.stroke();
+
+        const colors = [
+          "#4caf50", "#81c784", "#a5d6a7",
+          "#e53935", "#ef5350", "#ef9a9a"
+        ];
+
+        let i = 0;
+        Object.entries(themes).forEach(([theme, points]) => {
+          if (points.length < 2) return;
+
+          ctx.strokeStyle = colors[i % colors.length];
+          ctx.beginPath();
+
+          points.forEach((p, idx) => {
+            const x = padding + (p.step - 1) * (w / Math.max(1, maxStep - 1));
+            const y = padding + (1 - p.mean) * h;
+            idx === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+          });
+
+          ctx.stroke();
+          ctx.fillStyle = ctx.strokeStyle;
+          ctx.font = "12px sans-serif";
+          ctx.fillText(
+            theme,
+            padding + w + 5,
+            padding + (1 - points.at(-1).mean) * h
+          );
+          i++;
+        });
+      });
+  };

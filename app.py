@@ -4,6 +4,8 @@ from flask_sqlalchemy import SQLAlchemy
 from functools import wraps
 from datetime import datetime
 from services.themes import get_all_trickia_themes, is_valid_trickia_theme, get_opentdb_categories, get_triviaapi_tags
+from services.bandit import update_bandit_for_session
+from services.bandit import beta_mean, make_relative_buckets, choose_bucket, choose_difficulty
 import requests
 import html
 import random
@@ -66,6 +68,35 @@ class UserAchievement(db.Model):
 
     __table_args__ = (
         db.UniqueConstraint("user_id", "label", name="uq_user_achievement"),
+    )
+
+class UserThemeBanditState(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    theme = db.Column(db.String(50), nullable=False)
+
+    alpha = db.Column(db.Float, default=1.0)  # prior
+    beta = db.Column(db.Float, default=1.0)   # prior
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    __table_args__ = (
+        db.UniqueConstraint("user_id", "theme", name="uq_user_theme_bandit"),
+    )
+
+class UserThemeBanditSnapshot(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    theme = db.Column(db.String(50), nullable=False)
+
+    step = db.Column(db.Integer, nullable=False)  # compteur de run (session)
+    mean = db.Column(db.Float, nullable=False)    # alpha / (alpha+beta)
+    alpha = db.Column(db.Float, nullable=False)
+    beta = db.Column(db.Float, nullable=False)
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    __table_args__ = (
+        db.Index("ix_user_step", "user_id", "step"),
     )
 
 # =====================================================
@@ -146,11 +177,13 @@ def logout():
 # =====================================================
 # TRIVIA FETCH
 # =====================================================
-def fetch_opentdb(category_id):
+def fetch_opentdb(category_id, difficulty=None):
     url = "https://opentdb.com/api.php?amount=1&type=multiple"
     if category_id:
         url += f"&category={category_id}"
-
+    if difficulty in ("easy", "medium", "hard"):
+        url += f"&difficulty={difficulty}"
+    
     r = requests.get(url, timeout=5)
     data = r.json()
 
@@ -167,28 +200,40 @@ def fetch_opentdb(category_id):
 
     return question, correct, answers, q["difficulty"]
 
-def fetch_triviaapi(tags=None):
+def fetch_triviaapi(tags=None, difficulty=None):
     url = "https://the-trivia-api.com/v2/questions?limit=1"
 
     if tags:
-        # ex: categories=science,history
         joined = ",".join(tags)
         url += f"&categories={joined}"
 
-    q = requests.get(url, timeout=5).json()[0]
+    for _ in range(6):  # retry
+        try:
+            data = requests.get(url, timeout=5).json()
+            if not data:
+                continue
+            q = data[0]
+        except Exception:
+            continue
 
-    question = q["question"]["text"]
-    correct = q["correctAnswer"]
-    answers = q["incorrectAnswers"] + [correct]
-    random.shuffle(answers)
+        q_diff = q.get("difficulty", "unknown")
+        if difficulty and q_diff != difficulty:
+            continue
 
-    return (
-        question,
-        correct,
-        answers,
-        q.get("difficulty", "unknown"),
-        q.get("category", "")
-    )
+        question = q["question"]["text"]
+        correct = q["correctAnswer"]
+        answers = q["incorrectAnswers"] + [correct]
+        random.shuffle(answers)
+
+        return (
+            question,
+            correct,
+            answers,
+            q_diff,
+            q.get("category", "")
+        )
+
+    raise ValueError("No TriviaAPI question with requested difficulty")
 
 # =====================================================
 # SESSION START
@@ -215,7 +260,7 @@ def start_session():
     session["quiz_state"] = {
         "question_number": 0,
         "score": 0,
-        "used_questions": [],   # session-level memory (fast)
+        "used_hashes": [],   # session-level memory (fast)
         "theme_stats": {},
         "best_streak": 0,
         "current_streak": 0,
@@ -252,13 +297,42 @@ def question():
 
     chosen = None
 
+    # 1) scores depuis DB (pour allowed themes)
+    states = UserThemeBanditState.query.filter_by(user_id=user.id).all()
+    theme_to_state = {s.theme: s for s in states}
+
+    theme_to_score = {}
+    for t in allowed:
+        s = theme_to_state.get(t)
+        if s:
+            theme_to_score[t] = (s.alpha / (s.alpha + s.beta)) if (s.alpha + s.beta) > 0 else 0.5
+        else:
+            theme_to_score[t] = 0.5  # prior neutre
+
+    weak, mid, strong = make_relative_buckets(allowed, theme_to_score)
+
+    bucket = choose_bucket()
+    target_difficulty = choose_difficulty(bucket)
+
+    if bucket == "strong" and strong:
+        bucket_themes = strong
+    elif bucket == "weak" and weak:
+        bucket_themes = weak
+    else:
+        bucket_themes = mid if mid else allowed
+    if not bucket_themes:
+        bucket_themes = allowed
+
+
+    # theme choisi dans le bucket
+
     # --------------------------------------------------
     # SAFE FETCH WITH TRICKIA THEMES + DEDUPE
     # --------------------------------------------------
     for _ in range(6):
         try:
             # 🎯 1. Choose Trickia theme
-            theme = random.choice(allowed)
+            theme = random.choice(bucket_themes)
 
             opentdb_cats = get_opentdb_categories(theme)
             trivia_tags = get_triviaapi_tags(theme)
@@ -268,11 +342,11 @@ def question():
 
             if opentdb_cats and not use_triviaapi:
                 cid = random.choice(opentdb_cats)
-                q_text, c, a, d = fetch_opentdb(cid)
+                q_text, c, a, d = fetch_opentdb(cid, difficulty=target_difficulty)
                 source = "OpenTriviaDB"
 
             elif trivia_tags:
-                q_text, c, a, d, _ = fetch_triviaapi(trivia_tags)
+                q_text, c, a, d, _ = fetch_triviaapi(trivia_tags, difficulty=target_difficulty)
                 source = "TheTriviaAPI"
 
             else:
@@ -416,72 +490,98 @@ def answer():
 @app.route("/api/session/end", methods=["POST"])
 @login_required
 def end_session():
-        user = get_current_user()
-        data = request.json or {}
+    user = get_current_user()
+    data = request.json or {}
 
-        theme_stats = data.get("theme_stats", {})
-        best_streak_session = data.get("best_streak", 0)
+    theme_stats = data.get("theme_stats", {})
+    best_streak_session = data.get("best_streak", 0)
 
-        # 🔐 Sécurité : rien à enregistrer
-        if not isinstance(theme_stats, dict) or not theme_stats:
-            return jsonify({"status": "no_stats"}), 200
+    # 🔐 Sécurité : rien à enregistrer
+    if not isinstance(theme_stats, dict) or not theme_stats:
+        return jsonify({"status": "no_stats"}), 200
 
-        for theme, stats in theme_stats.items():
-            total = stats.get("total", 0)
-            correct = stats.get("correct", 0)
+    for theme, stats in theme_stats.items():
+        total = stats.get("total", 0)
+        correct = stats.get("correct", 0)
 
-            # 🚫 Ignore thèmes sans vraies questions
-            if total <= 0:
-                continue
+        # 🚫 Ignore thèmes sans vraies questions
+        if total <= 0:
+            continue
 
-            entry = UserThemeStats.query.filter_by(
+        entry = UserThemeStats.query.filter_by(
+            user_id=user.id,
+            theme=theme
+        ).first()
+
+        if not entry:
+            entry = UserThemeStats(
                 user_id=user.id,
-                theme=theme
+                theme=theme,
+                total_questions=0,
+                correct_answers=0,
+                best_streak=0
+            )
+            db.session.add(entry)
+
+        # 📊 Update stats
+        entry.total_questions += total
+        entry.correct_answers += correct
+        #entry.best_streak = max(entry.best_streak, best_streak_session)
+        entry.last_played = datetime.utcnow()
+
+        # 🏆 ACHIEVEMENT: Expert in <theme> (SESSION-BASED ONLY)
+        accuracy = correct / total if total > 0 else 0
+
+        # 🎯 Conditions strictes
+        if total >= 2 and accuracy >= 0.85:
+            label = f"Expert in {theme}!"
+
+            achievement = UserAchievement.query.filter_by(
+                user_id=user.id,
+                label=label
             ).first()
 
-            if not entry:
-                entry = UserThemeStats(
-                    user_id=user.id,
-                    theme=theme,
-                    total_questions=0,
-                    correct_answers=0,
-                    best_streak=0
-                )
-                db.session.add(entry)
-
-            # 📊 Update stats
-            entry.total_questions += total
-            entry.correct_answers += correct
-            entry.best_streak = max(entry.best_streak, best_streak_session)
-            entry.last_played = datetime.utcnow()
-
-            # 🏆 ACHIEVEMENT: Expert in <theme> (SESSION-BASED ONLY)
-            accuracy = correct / total if total > 0 else 0
-
-            # 🎯 Conditions strictes
-            if total >= 2 and accuracy >= 0.85:
-                label = f"Expert in {theme}!"
-
-                achievement = UserAchievement.query.filter_by(
-                    user_id=user.id,
-                    label=label
-                ).first()
-
-                if achievement:
-                    # ➕ Badge déjà existant → on incrémente
-                    achievement.count += 1
-                else:
-                    # 🆕 Nouveau badge réellement gagné
-                    db.session.add(
-                        UserAchievement(
-                            user_id=user.id,
-                            label=label,
-                            count=1
-                        )
+            if achievement:
+                # ➕ Badge déjà existant → on incrémente
+                achievement.count += 1
+            else:
+                # 🆕 Nouveau badge réellement gagné
+                db.session.add(
+                    UserAchievement(
+                        user_id=user.id,
+                        label=label,
+                        count=1
                     )
+                )
+        # step = dernier step + 1
+    last = (
+        UserThemeBanditSnapshot.query
+        .filter_by(user_id=user.id)
+        .order_by(UserThemeBanditSnapshot.step.desc())
+        .first()
+    )
+    step = (last.step + 1) if last else 1
 
-        db.session.commit()
-        return jsonify({"status": "ok"})
+    from services.bandit import ensure_bandit_state
+
+    # Initialiser le bandit pour tous les thèmes (prior neutre)
+    for theme in get_all_trickia_themes():
+        ensure_bandit_state(db, UserThemeBanditState, user.id, theme)
+
+    DISCOUNT = 0.85  # paramètre de récence
+
+    update_bandit_for_session(
+        db=db,
+        ModelState=UserThemeBanditState,
+        ModelSnap=UserThemeBanditSnapshot,
+        user_id=user.id,
+        theme_stats=theme_stats,
+        discount=DISCOUNT,
+        step=step
+    )
+
+    db.session.commit()
+    return jsonify({"status": "ok"})
 
 # =====================================================
 # STATS (SESSION)
@@ -572,6 +672,73 @@ def api_profile():
         } for a in achievements
     ]
 })
+
+@app.route("/api/model/state")
+@login_required
+def api_model_state():
+    user = get_current_user()
+
+    states = UserThemeBanditState.query.filter_by(user_id=user.id).all()
+
+    result = []
+    for s in states:
+        denom = s.alpha + s.beta
+        mean = (s.alpha / denom) if denom > 0 else 0.5
+
+        result.append({
+            "theme": s.theme,
+            "mean": round(mean, 4),
+            "alpha": round(s.alpha, 3),
+            "beta": round(s.beta, 3),
+            "updated_at": s.updated_at.isoformat()
+        })
+
+    return jsonify(result)
+
+@app.route("/api/model/history")
+@login_required
+def api_model_history():
+    user = get_current_user()
+
+    # État courant
+    states = UserThemeBanditState.query.filter_by(user_id=user.id).all()
+    if not states:
+        return jsonify({"themes": {}})
+
+    # Calcul des scores moyens
+    scored = []
+    for s in states:
+        denom = s.alpha + s.beta
+        mean = (s.alpha / denom) if denom > 0 else 0.5
+        scored.append((s.theme, mean))
+
+    # Tri
+    scored.sort(key=lambda x: x[1])
+
+    bottom = [t for t, _ in scored[:3]]
+    top = [t for t, _ in scored[-3:]]
+
+    selected = set(top + bottom)
+
+    # Récupération historique
+    snaps = (
+        UserThemeBanditSnapshot.query
+        .filter(
+            UserThemeBanditSnapshot.user_id == user.id,
+            UserThemeBanditSnapshot.theme.in_(selected)
+        )
+        .order_by(UserThemeBanditSnapshot.step)
+        .all()
+    )
+
+    result = {}
+    for snap in snaps:
+        result.setdefault(snap.theme, []).append({
+            "step": snap.step,
+            "mean": round(snap.mean, 4)
+        })
+
+    return jsonify({"themes": result})
 
 @app.route("/api/themes")
 @login_required
