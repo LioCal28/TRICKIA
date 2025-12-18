@@ -526,7 +526,7 @@ def end_session():
         # 📊 Update stats
         entry.total_questions += total
         entry.correct_answers += correct
-        #entry.best_streak = max(entry.best_streak, best_streak_session)
+        entry.best_streak = max(entry.best_streak, best_streak_session)
         entry.last_played = datetime.utcnow()
 
         # 🏆 ACHIEVEMENT: Expert in <theme> (SESSION-BASED ONLY)

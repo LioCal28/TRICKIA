@@ -706,41 +706,47 @@ window.addEventListener("load", async () => {
 
     const filtered = sessionThemeStats.filter(s => s.total >= 2);
 
-    if (filtered.length === 0) {
+    if (filtered.length < 2) {
         topList.innerHTML = "<li>Not enough data yet.</li>";
         bottomList.innerHTML = "<li>Not enough data yet.</li>";
         badgeContainer.innerHTML =
             "<p>Play more quizzes to unlock achievements.</p>";
     } else {
 
-        const bestSorted = [...filtered].sort((a, b) => b.percent - a.percent);
-        const worstSorted = [...filtered].sort((a, b) => a.percent - b.percent);
+        // Sort once, descending
+        const sorted = [...filtered].sort((a, b) => b.percent - a.percent);
 
-        bestSorted.slice(0, 3).forEach(e => {
-        const li = document.createElement("li");
-        li.innerHTML = `
-            <strong>${e.theme}</strong> — ${e.percent}% (${e.correct}/${e.total})<br>
-            <span class="theme-comment">
-                ${buildThemeComment(e.percent, true)}
-            </span>
-        `;
-        topList.appendChild(li);
+        // Top 2 best themes
+        const bestThemes = sorted.slice(0, 2);
+
+        // Top 2 worst themes (from the end, reversed for readability)
+        const worstThemes = sorted.slice(-2).reverse();
+
+        bestThemes.forEach(e => {
+            const li = document.createElement("li");
+            li.innerHTML = `
+                <strong>${e.theme}</strong> — ${e.percent}% (${e.correct}/${e.total})<br>
+                <span class="theme-comment">
+                    ${buildThemeComment(e.percent, true)}
+                </span>
+            `;
+            topList.appendChild(li);
         });
 
-        worstSorted.slice(0, 3).forEach(e => {
-        const li = document.createElement("li");
-        li.innerHTML = `
-            <strong>${e.theme}</strong> — ${e.percent}% (${e.correct}/${e.total})<br>
-            <span class="theme-comment">
-                ${buildThemeComment(e.percent, false)}
-            </span>
-        `;
-        bottomList.appendChild(li);
+        worstThemes.forEach(e => {
+            const li = document.createElement("li");
+            li.innerHTML = `
+                <strong>${e.theme}</strong> — ${e.percent}% (${e.correct}/${e.total})<br>
+                <span class="theme-comment">
+                    ${buildThemeComment(e.percent, false)}
+                </span>
+            `;
+            bottomList.appendChild(li);
         });
 
-        bestSorted
+        // Badges: only from best themes, with sufficient data
+        bestThemes
             .filter(e => e.percent >= 85 && e.total >= 2)
-            .slice(0, 3)
             .forEach(e => {
                 const badge = document.createElement("div");
                 badge.className = "badge-hexagon";
@@ -827,10 +833,10 @@ if (IS_PROFILE_PAGE) {
         const badges = document.getElementById("profile-badges");
         badges.innerHTML = "";
         data.achievements.forEach(a => {
-          const div = document.createElement("div");
-          div.className = "badge";
-          div.textContent = `${a.label} ×${a.count}`;
-          badges.appendChild(div);
+            const div = document.createElement("div");
+            div.className = "badge-hexagon";
+            div.textContent = `${a.label} ×${a.count}`;
+            badges.appendChild(div);
         });
       });
 
@@ -838,11 +844,36 @@ if (IS_PROFILE_PAGE) {
     // AI MODEL GRAPH
     // -----------------------------
     fetch("/api/model/history")
-      .then(res => res.json())
-      .then(data => {
+    .then(res => res.json())
+    .then(data => {
         const themes = data.themes || {};
         const canvas = document.getElementById("model-chart");
+
         if (!canvas || Object.keys(themes).length === 0) return;
+
+        // Compute max step FIRST
+        const maxStep = Math.max(
+        ...Object.values(themes).flat().map(p => p.step)
+        );
+
+        // Rank themes by final AI confidence (relative ranking)
+        const rankedThemes = Object.entries(themes)
+        .filter(([_, points]) => points.length >= 2)
+        .map(([theme, points]) => ({
+            theme,
+            finalMean: points.at(-1).mean
+        }))
+        .sort((a, b) => b.finalMean - a.finalMean)
+        .map(e => e.theme);
+
+        // Make canvas width depend on number of sessions
+        const MIN_WIDTH = 900;
+        const STEP_WIDTH = 90; // px per session
+
+        canvas.width = Math.max(
+        MIN_WIDTH,
+        maxStep * STEP_WIDTH
+        );
 
         const ctx = canvas.getContext("2d");
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -851,10 +882,7 @@ if (IS_PROFILE_PAGE) {
         const w = canvas.width - padding * 2;
         const h = canvas.height - padding * 2;
 
-        const maxStep = Math.max(
-          ...Object.values(themes).flat().map(p => p.step)
-        );
-
+        // Axes
         ctx.strokeStyle = "#888";
         ctx.beginPath();
         ctx.moveTo(padding, padding);
@@ -862,33 +890,66 @@ if (IS_PROFILE_PAGE) {
         ctx.lineTo(canvas.width - padding, canvas.height - padding);
         ctx.stroke();
 
-        const colors = [
-          "#4caf50", "#81c784", "#a5d6a7",
-          "#e53935", "#ef5350", "#ef9a9a"
-        ];
+        // -----------------------------
+        // Y AXIS LABELS (0% → 100%)
+        // -----------------------------
+        ctx.fillStyle = "#888";
+        ctx.font = "12px sans-serif";
+        ctx.textAlign = "right";
+        ctx.textBaseline = "middle";
+
+        [0, 0.25, 0.5, 0.75, 1].forEach(value => {
+        const y = padding + (1 - value) * h;
+
+        ctx.beginPath();
+        ctx.moveTo(padding - 5, y);
+        ctx.lineTo(padding, y);
+        ctx.stroke();
+
+        ctx.fillText(`${Math.round(value * 100)}%`, padding - 8, y);
+        });
 
         let i = 0;
         Object.entries(themes).forEach(([theme, points]) => {
-          if (points.length < 2) return;
+        if (points.length < 2) return;
 
-          ctx.strokeStyle = colors[i % colors.length];
-          ctx.beginPath();
+        // Determine color based on relative ranking
+        const rank = rankedThemes.indexOf(theme);
 
-          points.forEach((p, idx) => {
+        let color;
+        if (rank <= 1) {
+        color = "#4caf50"; // green: strong themes
+        } else if (rank <= 3) {
+        color = "#ffb300"; // orange: medium themes
+        } else {
+        color = "#e53935"; // red: weak themes
+        }
+
+        ctx.strokeStyle = color;
+        ctx.beginPath();
+
+        points.forEach((p, idx) => {
             const x = padding + (p.step - 1) * (w / Math.max(1, maxStep - 1));
             const y = padding + (1 - p.mean) * h;
             idx === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-          });
-
-          ctx.stroke();
-          ctx.fillStyle = ctx.strokeStyle;
-          ctx.font = "12px sans-serif";
-          ctx.fillText(
-            theme,
-            padding + w + 5,
-            padding + (1 - points.at(-1).mean) * h
-          );
-          i++;
         });
-      });
+
+        ctx.stroke();
+
+        // Theme label (improved readability)
+        ctx.save();
+        ctx.font = "bold 13px sans-serif";
+        ctx.fillStyle = "#111";        // texte foncé, lisible
+        ctx.shadowColor = "rgba(255,255,255,0.8)";
+        ctx.shadowBlur = 4;
+        ctx.fillText(
+        theme,
+        padding + w + 8,
+        padding + (1 - points.at(-1).mean) * h
+        );
+        ctx.restore();
+
+        i++;
+        });
+    });
   };

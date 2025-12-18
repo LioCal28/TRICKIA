@@ -45,21 +45,28 @@
         <ul id="profile-theme-list"></ul>
       </section>
 
-      <section class="profile-stats">
-        <h2>AI evolution</h2>
-        <canvas id="model-chart" width="900" height="320"></canvas>
-        <p class="hint">
-          Evolution of your strongest and weakest themes across quiz sessions.
-        </p>
-      </section>
-
-      <!-- RIGHT COLUMN : STREAK -->
       <aside class="profile-streak">
-        <div class="streak-card small">
+        <h2>Your best streak</h2>
+        <div class="streak-card">
           <div class="streak-value" id="profile-best-streak">0</div>
           <div class="streak-label">Best streak</div>
         </div>
       </aside>
+
+      <section class="profile-stats wide">
+        <h2>How the AI adapts to you</h2>
+
+        <div class="chart-scroll">
+          <canvas id="model-chart" height="320"></canvas>
+        </div>
+
+        <p class="hint evolution-hint">
+          This graph represents the evolution of the AI model based on your quiz results.
+          It does not measure how “good” your answers are, but how the AI progressively
+          adapts the quiz to your performance, with a stronger weight given to recent sessions.
+        </p>
+
+      </section>
 
     </div>
 

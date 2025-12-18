@@ -1043,7 +1043,7 @@ body.dark #progress-container {
 
 .profile-grid {
   display: grid;
-  grid-template-columns: 220px 1fr 180px;
+  grid-template-columns: 220px 1fr 220px;
   gap: 30px;
   align-items: flex-start;
 }
@@ -1053,7 +1053,17 @@ body.dark #progress-container {
 ========================= */
 
 .profile-streak {
-  position: sticky;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.profile-streak h2 {
+  margin-bottom: 12px;
+}
+
+.profile-streak {
+  position: static;
   top: 100px;
 }
 
@@ -1085,4 +1095,44 @@ body.dark #progress-container {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.chart-scroll {
+  overflow-x: auto;
+  padding-bottom: 10px;
+}
+
+/* ============================= */
+/* WIDE PROFILE SECTION (GRAPH)  */
+/* ============================= */
+
+.profile-stats.wide {
+  grid-column: 1 / -1;        /* prend toute la largeur de la grille */
+}
+
+.chart-scroll {
+  width: 100%;
+  max-width: 1400px;          /* 🔥 AUGMENTE LA LARGEUR VISIBLE */
+  overflow-x: auto;
+  margin: 0 auto;             /* centre le cadre */
+  padding-bottom: 12px;
+}
+
+/* Optionnel : améliore la sensation de scroll */
+.chart-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.chart-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+.evolution-hint {
+  max-width: 900px;
+  margin: 12px auto 0;
+  text-align: center;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--text-muted);
 }
